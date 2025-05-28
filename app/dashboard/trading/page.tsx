@@ -97,49 +97,28 @@ export default function TradingPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
         </div>
       ) : (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Symbol
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Price
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Change
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Change %
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {symbols.map((symbol) => (
-                <tr key={symbol.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {symbol.symbol}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {symbol.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                    --
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                    --
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                    --
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="bg-white shadow rounded-lg p-4">
+          <div className="grid grid-cols-5 gap-4 mb-4 text-sm font-medium text-gray-500 uppercase">
+            <div>Symbol</div>
+            <div>Name</div>
+            <div className="text-right">Last Price</div>
+            <div className="text-right">Change</div>
+            <div className="text-right">Change %</div>
+          </div>
+          <div className="space-y-2">
+            {symbols.map((symbol) => (
+              <div
+                key={symbol.id}
+                className="grid grid-cols-5 gap-4 py-3 px-2 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div className="font-medium text-gray-900">{symbol.symbol}</div>
+                <div className="text-gray-500">{symbol.name}</div>
+                <div className="text-right text-gray-900">--</div>
+                <div className="text-right text-gray-900">--</div>
+                <div className="text-right text-gray-900">--</div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
