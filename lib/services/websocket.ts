@@ -88,8 +88,35 @@ class WebSocketService {
                 console.log("Received publication:", ctx);
                 const channel = ctx.channel;
                 if (channel.includes("watchlist")) {
+                    // sample ctx data
+                    // {
+                    //     "channel": "watchlist:AAAJ084750",
+                    //     "data": {
+                    //         "event": "ANGEL_ONE_QUOTES",
+                    //         "data": {
+                    //             "AADHARHFC": {
+                    //                 "TokenInfo": {
+                    //                     "ExchangeType": 1,
+                    //                     "Token": "23729"
+                    //                 },
+                    //                 "SequenceNumber": 16534003,
+                    //                 "ExchangeFeedTimeEpochMillis": 1748428150000,
+                    //                 "LastTradedPrice": 43965,
+                    //                 "LastTradedQty": 5,
+                    //                 "AvgTradedPrice": 44502,
+                    //                 "VolumeTradedToday": 364024,
+                    //                 "TotalBuyQty": 77,
+                    //                 "TotalSellQty": 0,
+                    //                 "OpenPrice": 44695,
+                    //                 "HighPrice": 45145,
+                    //                 "LowPrice": 43830,
+                    //                 "ClosePrice": 44505
+                    //             }
+                    //         }
+                    //     },
+                    //     "offset": 1
+                    // }
                     const data = ctx.data.data;
-                    // stocks
                     console.log("stock quotes", data);
                 }
             });
