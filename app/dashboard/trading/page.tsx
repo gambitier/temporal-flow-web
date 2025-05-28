@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { useWatchlists, useWatchlistSymbols } from "@/lib/hooks/useWatchlists";
-import { useStockData } from "@/lib/hooks/useStockData";
 
 type FilterType = "all" | "gainers" | "losers";
 
@@ -28,27 +27,7 @@ export default function TradingPage() {
   const { symbols, isLoading: isLoadingSymbols } =
     useWatchlistSymbols(selectedWatchlist);
 
-  // Get real-time stock data
-  const { stockData, isLoading: isLoadingStockData } = useStockData(
-    symbols.map((symbol) => symbol.symbol)
-  );
-
-  const isLoading =
-    isLoadingWatchlists || isLoadingSymbols || isLoadingStockData;
-
-  const filteredSymbols = symbols.filter((symbol) => {
-    const data = stockData[symbol.symbol];
-    if (!data) return true;
-
-    switch (filter) {
-      case "gainers":
-        return data.change > 0;
-      case "losers":
-        return data.change < 0;
-      default:
-        return true;
-    }
-  });
+  const isLoading = isLoadingWatchlists || isLoadingSymbols;
 
   if (isLoadingWatchlists) {
     return (
@@ -113,7 +92,7 @@ export default function TradingPage() {
         </div>
       </div>
 
-      {isLoadingSymbols || isLoadingStockData ? (
+      {isLoadingSymbols ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
         </div>
@@ -140,46 +119,25 @@ export default function TradingPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredSymbols.map((symbol) => {
-                const data = stockData[symbol.symbol];
-                return (
-                  <tr key={symbol.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {symbol.symbol}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {symbol.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                      {data?.lastPrice?.toFixed(2) || "--"}
-                    </td>
-                    <td
-                      className={`px-6 py-4 whitespace-nowrap text-sm text-right ${
-                        data?.change && data.change > 0
-                          ? "text-green-600"
-                          : data?.change && data.change < 0
-                          ? "text-red-600"
-                          : "text-gray-900"
-                      }`}
-                    >
-                      {data?.change?.toFixed(2) || "--"}
-                    </td>
-                    <td
-                      className={`px-6 py-4 whitespace-nowrap text-sm text-right ${
-                        data?.changePercent && data.changePercent > 0
-                          ? "text-green-600"
-                          : data?.changePercent && data.changePercent < 0
-                          ? "text-red-600"
-                          : "text-gray-900"
-                      }`}
-                    >
-                      {data?.changePercent
-                        ? `${data.changePercent.toFixed(2)}%`
-                        : "--"}
-                    </td>
-                  </tr>
-                );
-              })}
+              {symbols.map((symbol) => (
+                <tr key={symbol.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {symbol.symbol}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {symbol.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                    --
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                    --
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                    --
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

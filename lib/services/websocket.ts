@@ -1,17 +1,7 @@
 import { Centrifuge } from 'centrifuge';
 
-interface StockData {
-    symbol: string;
-    lastPrice: number;
-    change: number;
-    changePercent: number;
-}
-
-type StockDataCallback = (data: StockData) => void;
-
 class WebSocketService {
     private centrifuge: Centrifuge | null = null;
-    private subscribers: Map<string, Set<StockDataCallback>> = new Map();
     private isConnecting: boolean = false;
 
     constructor() {
@@ -77,7 +67,6 @@ class WebSocketService {
                 debug: true,
             });
 
-
             this.centrifuge.on("connecting", (ctx) => {
                 console.log("WebSocket connecting:", ctx);
             });
@@ -115,29 +104,11 @@ class WebSocketService {
         }
     }
 
-    subscribe(symbol: string, callback: StockDataCallback) {
-        if (!this.subscribers.has(symbol)) {
-            this.subscribers.set(symbol, new Set());
-        }
-        this.subscribers.get(symbol)!.add(callback);
-    }
-
-    unsubscribe(symbol: string, callback: StockDataCallback) {
-        const callbacks = this.subscribers.get(symbol);
-        if (callbacks) {
-            callbacks.delete(callback);
-            if (callbacks.size === 0) {
-                this.subscribers.delete(symbol);
-            }
-        }
-    }
-
     disconnect() {
         if (this.centrifuge) {
             this.centrifuge.disconnect();
             this.centrifuge = null;
         }
-        this.subscribers.clear();
     }
 }
 
