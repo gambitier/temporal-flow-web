@@ -102,12 +102,8 @@ class WebSocketService {
                 const channel = ctx.channel;
                 if (channel.includes("watchlist")) {
                     const data = ctx.data.data;
-                    Object.entries(data).forEach(([symbol, stockData]) => {
-                        const callbacks = this.subscribers.get(symbol);
-                        if (callbacks) {
-                            callbacks.forEach((callback) => callback(stockData as StockData));
-                        }
-                    });
+                    // stocks
+                    console.log("stock quotes", data);
                 }
             });
 
