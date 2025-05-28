@@ -1,9 +1,23 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ArrowRight, BarChart3, Brain, Shield, Zap, TrendingUp, Clock, Users } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  ArrowRight,
+  BarChart3,
+  Brain,
+  Shield,
+  Zap,
+  TrendingUp,
+  Clock,
+  Users,
+} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function LandingPage() {
   return (
@@ -15,17 +29,28 @@ export default function LandingPage() {
             <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">Temporal Flow</span>
+            <span className="text-xl font-bold text-gray-900">
+              Temporal Flow
+            </span>
           </div>
 
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link
+              href="#features"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
               Features
             </Link>
-            <Link href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link
+              href="#about"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
               About
             </Link>
-            <Link href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link
+              href="#pricing"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
               Pricing
             </Link>
           </nav>
@@ -47,7 +72,10 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-4">
-                <Badge variant="secondary" className="bg-purple-100 text-purple-700 hover:bg-purple-200">
+                <Badge
+                  variant="secondary"
+                  className="bg-purple-100 text-purple-700 hover:bg-purple-200"
+                >
                   <Brain className="w-4 h-4 mr-2" />
                   AI-Powered Trading
                 </Badge>
@@ -58,8 +86,9 @@ export default function LandingPage() {
                   </span>
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Revolutionary automated trading system that leverages advanced AI algorithms to analyze market
-                  patterns, predict trends, and execute profitable trades 24/7.
+                  Revolutionary automated trading system that leverages advanced
+                  AI algorithms to analyze market patterns, predict trends, and
+                  execute profitable trades 24/7.
                 </p>
               </div>
 
@@ -116,9 +145,12 @@ export default function LandingPage() {
             <Badge variant="secondary" className="bg-gray-100 text-gray-700">
               Features
             </Badge>
-            <h2 className="text-4xl font-bold text-gray-900">Why Choose Temporal Flow?</h2>
+            <h2 className="text-4xl font-bold text-gray-900">
+              Why Choose Temporal Flow?
+            </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Our cutting-edge technology gives you the competitive edge in today's fast-paced markets.
+              Our cutting-edge technology gives you the competitive edge in
+              today's fast-paced markets.
             </p>
           </div>
 
@@ -130,7 +162,8 @@ export default function LandingPage() {
                 </div>
                 <CardTitle>AI-Powered Analysis</CardTitle>
                 <CardDescription>
-                  Advanced machine learning algorithms analyze thousands of market indicators in real-time.
+                  Advanced machine learning algorithms analyze thousands of
+                  market indicators in real-time.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -142,7 +175,8 @@ export default function LandingPage() {
                 </div>
                 <CardTitle>Lightning Fast Execution</CardTitle>
                 <CardDescription>
-                  Execute trades in milliseconds with our high-frequency trading infrastructure.
+                  Execute trades in milliseconds with our high-frequency trading
+                  infrastructure.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -154,7 +188,8 @@ export default function LandingPage() {
                 </div>
                 <CardTitle>Risk Management</CardTitle>
                 <CardDescription>
-                  Sophisticated risk controls and stop-loss mechanisms protect your investments.
+                  Sophisticated risk controls and stop-loss mechanisms protect
+                  your investments.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -166,7 +201,8 @@ export default function LandingPage() {
                 </div>
                 <CardTitle>Real-time Analytics</CardTitle>
                 <CardDescription>
-                  Comprehensive dashboards with live market data and performance metrics.
+                  Comprehensive dashboards with live market data and performance
+                  metrics.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -177,7 +213,10 @@ export default function LandingPage() {
                   <Clock className="w-6 h-6 text-white" />
                 </div>
                 <CardTitle>24/7 Trading</CardTitle>
-                <CardDescription>Never miss an opportunity with round-the-clock automated trading.</CardDescription>
+                <CardDescription>
+                  Never miss an opportunity with round-the-clock automated
+                  trading.
+                </CardDescription>
               </CardHeader>
             </Card>
 
@@ -188,7 +227,8 @@ export default function LandingPage() {
                 </div>
                 <CardTitle>Expert Support</CardTitle>
                 <CardDescription>
-                  Dedicated support team and trading experts available when you need them.
+                  Dedicated support team and trading experts available when you
+                  need them.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -197,7 +237,10 @@ export default function LandingPage() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 px-4 bg-gradient-to-r from-gray-50 to-gray-100">
+      <section
+        id="about"
+        className="py-20 px-4 bg-gradient-to-r from-gray-50 to-gray-100"
+      >
         <div className="container mx-auto max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative">
@@ -211,17 +254,25 @@ export default function LandingPage() {
             </div>
 
             <div className="space-y-6">
-              <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+              <Badge
+                variant="secondary"
+                className="bg-purple-100 text-purple-700"
+              >
                 About Temporal Flow
               </Badge>
-              <h2 className="text-4xl font-bold text-gray-900">The Future of Automated Trading</h2>
+              <h2 className="text-4xl font-bold text-gray-900">
+                The Future of Automated Trading
+              </h2>
               <p className="text-lg text-gray-600 leading-relaxed">
-                Temporal Flow represents the next evolution in algorithmic trading. Our proprietary AI models process
-                vast amounts of market data, identifying patterns and opportunities that human traders might miss.
+                Temporal Flow represents the next evolution in algorithmic
+                trading. Our proprietary AI models process vast amounts of
+                market data, identifying patterns and opportunities that human
+                traders might miss.
               </p>
               <p className="text-lg text-gray-600 leading-relaxed">
-                Built by a team of quantitative analysts, machine learning engineers, and trading veterans, our platform
-                combines decades of market expertise with cutting-edge technology.
+                Built by a team of quantitative analysts, machine learning
+                engineers, and trading veterans, our platform combines decades
+                of market expertise with cutting-edge technology.
               </p>
 
               <div className="grid grid-cols-2 gap-6 pt-4">
@@ -243,19 +294,26 @@ export default function LandingPage() {
       <section className="py-20 px-4 bg-gradient-to-r from-purple-600 to-pink-600">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="space-y-8">
-            <h2 className="text-4xl lg:text-5xl font-bold text-white">Ready to Transform Your Trading?</h2>
+            <h2 className="text-4xl lg:text-5xl font-bold text-white">
+              Ready to Transform Your Trading?
+            </h2>
             <p className="text-xl text-purple-100 max-w-2xl mx-auto">
-              Join thousands of successful traders who trust Temporal Flow to maximize their profits.
+              Join thousands of successful traders who trust Temporal Flow to
+              maximize their profits.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" className="bg-white text-purple-600 hover:bg-gray-100">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="bg-white text-purple-600 hover:bg-gray-100"
+              >
                 Start Free Trial
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <Button
                 size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-purple-600"
+                variant="secondary"
+                className="bg-white text-purple-600 hover:bg-gray-100"
               >
                 Schedule Demo
               </Button>
@@ -275,7 +333,9 @@ export default function LandingPage() {
                 </div>
                 <span className="text-xl font-bold">Temporal Flow</span>
               </div>
-              <p className="text-gray-400">Revolutionary automated trading system powered by advanced AI.</p>
+              <p className="text-gray-400">
+                Revolutionary automated trading system powered by advanced AI.
+              </p>
             </div>
 
             <div>
@@ -348,5 +408,5 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
