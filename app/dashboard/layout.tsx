@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { TrendingUp, User, Settings, Menu, X } from "lucide-react";
+import { TrendingUp, User, Settings, Menu, X, LogOut } from "lucide-react";
 import AuthCheck from "@/components/auth/AuthCheck";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: TrendingUp },
@@ -19,6 +20,7 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   return (
     <AuthCheck>
@@ -74,6 +76,13 @@ export default function DashboardLayout({
                   </Link>
                 );
               })}
+              <button
+                onClick={logout}
+                className="w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <LogOut className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
+                Logout
+              </button>
             </nav>
           </div>
         </div>
@@ -115,6 +124,13 @@ export default function DashboardLayout({
                   </Link>
                 );
               })}
+              <button
+                onClick={logout}
+                className="w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <LogOut className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
+                Logout
+              </button>
             </nav>
           </div>
         </div>

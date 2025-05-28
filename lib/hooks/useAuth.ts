@@ -109,10 +109,17 @@ export function useAuth() {
         },
     });
 
+    const logout = () => {
+        localStorage.removeItem("token");
+        setUser(null);
+        router.push("/login");
+    };
+
     return {
         user,
         login: loginMutation.mutate,
         register: registerMutation.mutate,
+        logout,
         isLoading: loginMutation.isPending || registerMutation.isPending,
         error: loginMutation.error || registerMutation.error,
     };
