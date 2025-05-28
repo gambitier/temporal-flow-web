@@ -3,12 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { TrendingUp, User, Settings, Menu, X, LogOut } from "lucide-react";
+import {
+  TrendingUp,
+  User,
+  Settings,
+  Menu,
+  X,
+  LogOut,
+  LineChart,
+} from "lucide-react";
 import AuthCheck from "@/components/auth/AuthCheck";
 import { useAuth } from "@/lib/hooks/useAuth";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: TrendingUp },
+  { name: "Trading", href: "/dashboard/trading", icon: LineChart },
   { name: "Profile", href: "/dashboard/profile", icon: User },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];

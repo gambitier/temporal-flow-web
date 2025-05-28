@@ -1,6 +1,7 @@
 interface ApiEndpoints {
     login: string;
     register: string;
+    wsUrl: string;
 }
 
 interface ApiConfig {
@@ -18,6 +19,7 @@ const config: Config = {
         endpoints: {
             login: "/api/v1/auth/login",
             register: "/api/v1/users",
+            wsUrl: process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8085/ws",
         },
     },
 } as const;
