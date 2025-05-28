@@ -5,12 +5,10 @@ class WebSocketService {
     private isConnecting: boolean = false;
 
     constructor() {
-        if (typeof window !== 'undefined') {
-            this.connect();
-        }
+        // Remove automatic connection from constructor
     }
 
-    private async connect() {
+    public async connect() {
         if (this.isConnecting || this.centrifuge) return;
 
         try {

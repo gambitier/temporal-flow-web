@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import config from "@/lib/config";
+import websocketService from "@/lib/services/websocket";
 
 interface LoginCredentials {
     email: string;
@@ -88,6 +89,7 @@ export function useAuth() {
         const token = localStorage.getItem("token");
         if (token) {
             fetchUserData(token).then(setUser);
+            websocketService.connect();
         }
     }, []);
 
@@ -98,6 +100,7 @@ export function useAuth() {
             localStorage.setItem("token", token);
             const userData = await fetchUserData(token);
             setUser(userData);
+            await websocketService.connect();
             router.push("/dashboard");
         },
     });
@@ -112,6 +115,7 @@ export function useAuth() {
     const logout = () => {
         localStorage.removeItem("token");
         setUser(null);
+        websocketService.disconnect();
         router.push("/login");
     };
 
