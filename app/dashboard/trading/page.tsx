@@ -1,11 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { useWatchlists, useWatchlistSymbols } from "@/lib/hooks/useWatchlists";
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  createColumnHelper,
+} from "@tanstack/react-table";
 
 type FilterType = "all" | "gainers" | "losers";
+
+interface Symbol {
+  id: string;
+  symbol: string;
+  name: string;
+  lastPrice?: number;
+  change?: number;
+  changePercent?: number;
+}
+
+const columnHelper = createColumnHelper<Symbol>();
+
+const columns = [
+  columnHelper.accessor("symbol", {
+    header: "Symbol",
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor("name", {
+    header: "Name",
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor("lastPrice", {
+    header: "Last Price",
+    cell: () => "--",
+  }),
+  columnHelper.accessor("change", {
+    header: "Change",
+    cell: () => "--",
+  }),
+  columnHelper.accessor("changePercent", {
+    header: "Change %",
+    cell: () => "--",
+  }),
+];
 
 export default function TradingPage() {
   const { user } = useAuth();
@@ -26,6 +66,12 @@ export default function TradingPage() {
   // Fetch symbols for selected watchlist
   const { symbols, isLoading: isLoadingSymbols } =
     useWatchlistSymbols(selectedWatchlist);
+
+  const table = useReactTable({
+    data: symbols,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   const isLoading = isLoadingWatchlists || isLoadingSymbols;
 
@@ -97,27 +143,44 @@ export default function TradingPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
         </div>
       ) : (
-        <div className="bg-white shadow rounded-lg p-4">
-          <div className="grid grid-cols-5 gap-4 mb-4 text-sm font-medium text-gray-500 uppercase">
-            <div>Symbol</div>
-            <div>Name</div>
-            <div className="text-right">Last Price</div>
-            <div className="text-right">Change</div>
-            <div className="text-right">Change %</div>
-          </div>
-          <div className="space-y-2">
-            {symbols.map((symbol) => (
-              <div
-                key={symbol.id}
-                className="grid grid-cols-5 gap-4 py-3 px-2 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <div className="font-medium text-gray-900">{symbol.symbol}</div>
-                <div className="text-gray-500">{symbol.name}</div>
-                <div className="text-right text-gray-900">--</div>
-                <div className="text-right text-gray-900">--</div>
-                <div className="text-right text-gray-900">--</div>
-              </div>
-            ))}
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="hover:bg-gray-50">
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
