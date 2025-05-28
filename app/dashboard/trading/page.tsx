@@ -127,13 +127,16 @@ export default function TradingPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-900">Trading</h1>
-        <div className="flex items-center space-x-4">
+      {/* Responsive header controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+        <h1 className="text-2xl font-semibold text-gray-900 flex-shrink-0">
+          Trading
+        </h1>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
           <select
             value={selectedWatchlist}
             onChange={(e) => setSelectedWatchlist(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+            className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm w-full sm:w-auto"
             disabled={isLoadingWatchlists}
           >
             <option value="">Select a watchlist</option>
@@ -143,10 +146,10 @@ export default function TradingPage() {
               </option>
             ))}
           </select>
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-row flex-wrap gap-2 w-full sm:w-auto">
             <button
               onClick={() => setFilter("all")}
-              className={`px-3 py-1 rounded-md text-sm font-medium ${
+              className={`px-3 py-1 rounded-md text-sm font-medium w-full sm:w-auto ${
                 filter === "all"
                   ? "bg-purple-100 text-purple-700"
                   : "text-gray-500 hover:text-gray-700"
@@ -156,7 +159,7 @@ export default function TradingPage() {
             </button>
             <button
               onClick={() => setFilter("gainers")}
-              className={`px-3 py-1 rounded-md text-sm font-medium flex items-center ${
+              className={`px-3 py-1 rounded-md text-sm font-medium flex items-center w-full sm:w-auto ${
                 filter === "gainers"
                   ? "bg-green-100 text-green-700"
                   : "text-gray-500 hover:text-gray-700"
@@ -167,7 +170,7 @@ export default function TradingPage() {
             </button>
             <button
               onClick={() => setFilter("losers")}
-              className={`px-3 py-1 rounded-md text-sm font-medium flex items-center ${
+              className={`px-3 py-1 rounded-md text-sm font-medium flex items-center w-full sm:w-auto ${
                 filter === "losers"
                   ? "bg-red-100 text-red-700"
                   : "text-gray-500 hover:text-gray-700"
