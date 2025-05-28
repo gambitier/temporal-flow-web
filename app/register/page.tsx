@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +10,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -19,41 +19,11 @@ export default function RegisterPage() {
     first_name: "",
     last_name: "",
   });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const { register, isLoading, error } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const response = await fetch("http://localhost:8085/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Registration failed");
-      }
-
-      // Redirect to login page after successful registration
-      router.push("/login?registered=true");
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred during registration"
-      );
-    } finally {
-      setLoading(false);
-    }
+    register(formData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,16 +149,20 @@ export default function RegisterPage() {
 
                 {error && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                    <p className="text-sm text-red-600">{error}</p>
+                    <p className="text-sm text-red-600">
+                      {error instanceof Error
+                        ? error.message
+                        : "An error occurred"}
+                    </p>
                   </div>
                 )}
 
                 <Button
                   type="submit"
-                  disabled={loading}
+                  disabled={isLoading}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                 >
-                  {loading ? (
+                  {isLoading ? (
                     <div className="flex items-center justify-center">
                       <svg
                         className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"

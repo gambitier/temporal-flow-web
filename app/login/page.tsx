@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,46 +11,27 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const searchParams = useSearchParams();
+  const { login, isLoading, error } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    login(formData);
+  };
 
-    try {
-      const response = await fetch("http://localhost:8085/api/v1/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
-      }
-
-      // Store the token
-      localStorage.setItem("jwtToken", data.access_token);
-
-      // Redirect to dashboard or home page
-      router.push("/dashboard");
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An error occurred during login"
-      );
-    } finally {
-      setLoading(false);
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
@@ -82,11 +63,19 @@ export default function LoginPage() {
                 Welcome back
               </CardTitle>
               <CardDescription className="text-center">
-                Enter your credentials to access your account
+                Sign in to your account
               </CardDescription>
             </CardHeader>
 
             <div className="p-6">
+              {searchParams.get("registered") && (
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                  <p className="text-sm text-green-600">
+                    Registration successful! Please sign in.
+                  </p>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <label
@@ -97,12 +86,13 @@ export default function LoginPage() {
                   </label>
                   <input
                     id="email"
+                    name="email"
                     type="email"
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="john@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
                   />
                 </div>
 
@@ -115,27 +105,32 @@ export default function LoginPage() {
                   </label>
                   <input
                     id="password"
+                    name="password"
                     type="password"
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleChange}
                   />
                 </div>
 
                 {error && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                    <p className="text-sm text-red-600">{error}</p>
+                    <p className="text-sm text-red-600">
+                      {error instanceof Error
+                        ? error.message
+                        : "An error occurred"}
+                    </p>
                   </div>
                 )}
 
                 <Button
                   type="submit"
-                  disabled={loading}
+                  disabled={isLoading}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                 >
-                  {loading ? (
+                  {isLoading ? (
                     <div className="flex items-center justify-center">
                       <svg
                         className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -170,7 +165,7 @@ export default function LoginPage() {
                     href="/register"
                     className="font-medium text-purple-600 hover:text-purple-500"
                   >
-                    Create one
+                    Sign up
                   </Link>
                 </p>
               </form>
