@@ -21,29 +21,6 @@ interface Symbol {
 
 const columns: ColumnDef<Symbol>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <input
-        type="checkbox"
-        checked={table.getIsAllPageRowsSelected()}
-        onChange={(value) =>
-          table.toggleAllPageRowsSelected(!!value.target.checked)
-        }
-        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-      />
-    ),
-    cell: ({ row }) => (
-      <input
-        type="checkbox"
-        checked={row.getIsSelected()}
-        onChange={(value) => row.toggleSelected(!!value.target.checked)}
-        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
     accessorKey: "symbol",
     header: ({ column }) => {
       return (
