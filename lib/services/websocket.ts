@@ -1,11 +1,38 @@
 import { Centrifuge } from 'centrifuge';
 
+type EventCallback = (ctx: any) => void;
+
 class WebSocketService {
     private centrifuge: Centrifuge | null = null;
     private isConnecting: boolean = false;
+    private eventHandlers: Map<string, EventCallback[]> = new Map();
 
     constructor() {
         // Remove automatic connection from constructor
+    }
+
+    public on(event: string, callback: EventCallback) {
+        if (!this.eventHandlers.has(event)) {
+            this.eventHandlers.set(event, []);
+        }
+        this.eventHandlers.get(event)?.push(callback);
+    }
+
+    public off(event: string, callback: EventCallback) {
+        const handlers = this.eventHandlers.get(event);
+        if (handlers) {
+            const index = handlers.indexOf(callback);
+            if (index !== -1) {
+                handlers.splice(index, 1);
+            }
+        }
+    }
+
+    private emit(event: string, ctx: any) {
+        const handlers = this.eventHandlers.get(event);
+        if (handlers) {
+            handlers.forEach(callback => callback(ctx));
+        }
     }
 
     public async connect() {
@@ -67,58 +94,30 @@ class WebSocketService {
 
             this.centrifuge.on("connecting", (ctx) => {
                 console.log("WebSocket connecting:", ctx);
+                this.emit("connecting", ctx);
             });
 
             this.centrifuge.on("connected", (ctx) => {
                 console.log("WebSocket connected:", ctx);
                 this.isConnecting = false;
+                this.emit("connected", ctx);
             });
 
             this.centrifuge.on("disconnected", (ctx) => {
                 console.log("WebSocket disconnected:", ctx);
                 this.isConnecting = false;
+                this.emit("disconnected", ctx);
             });
 
             this.centrifuge.on("error", (error) => {
                 console.error("WebSocket error:", error);
                 this.isConnecting = false;
+                this.emit("error", error);
             });
 
             this.centrifuge.on("publication", (ctx) => {
+                this.emit("publication", ctx);
                 console.log("Received publication:", ctx);
-                const channel = ctx.channel;
-                if (channel.includes("watchlist")) {
-                    // sample ctx data
-                    // {
-                    //     "channel": "watchlist:AAAJ084750",
-                    //     "data": {
-                    //         "event": "ANGEL_ONE_QUOTES",
-                    //         "data": {
-                    //             "AADHARHFC": {
-                    //                 "TokenInfo": {
-                    //                     "ExchangeType": 1,
-                    //                     "Token": "23729"
-                    //                 },
-                    //                 "SequenceNumber": 16534003,
-                    //                 "ExchangeFeedTimeEpochMillis": 1748428150000,
-                    //                 "LastTradedPrice": 43965,
-                    //                 "LastTradedQty": 5,
-                    //                 "AvgTradedPrice": 44502,
-                    //                 "VolumeTradedToday": 364024,
-                    //                 "TotalBuyQty": 77,
-                    //                 "TotalSellQty": 0,
-                    //                 "OpenPrice": 44695,
-                    //                 "HighPrice": 45145,
-                    //                 "LowPrice": 43830,
-                    //                 "ClosePrice": 44505
-                    //             }
-                    //         }
-                    //     },
-                    //     "offset": 1
-                    // }
-                    const data = ctx.data.data;
-                    console.log("stock quotes", data);
-                }
             });
 
             console.log("Connecting to WebSocket...");
@@ -126,6 +125,7 @@ class WebSocketService {
         } catch (error) {
             console.error("Error connecting to WebSocket:", error);
             this.isConnecting = false;
+            this.emit("error", error);
         }
     }
 

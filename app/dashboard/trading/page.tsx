@@ -7,19 +7,53 @@ import { useWatchlists, useWatchlistSymbols } from "@/lib/hooks/useWatchlists";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
+import websocketService from "@/lib/services/websocket";
 
 type FilterType = "all" | "gainers" | "losers";
 
-interface Symbol {
-  id: string;
+interface StockQuote {
   symbol: string;
   name: string;
-  lastPrice?: number;
-  change?: number;
-  changePercent?: number;
+  lastPrice: number;
+  change: number;
+  changePercent: number;
+  openPrice: number;
+  highPrice: number;
+  lowPrice: number;
+  closePrice: number;
+  volume: number;
+  timestamp: string;
 }
 
-const columns: ColumnDef<Symbol>[] = [
+interface WebSocketContext {
+  channel: string;
+  data: {
+    event: string;
+    data: {
+      [key: string]: {
+        TokenInfo: {
+          ExchangeType: number;
+          Token: string;
+        };
+        SequenceNumber: number;
+        ExchangeFeedTimeEpochMillis: number;
+        LastTradedPrice: number;
+        LastTradedQty: number;
+        AvgTradedPrice: number;
+        VolumeTradedToday: number;
+        TotalBuyQty: number;
+        TotalSellQty: number;
+        OpenPrice: number;
+        HighPrice: number;
+        LowPrice: number;
+        ClosePrice: number;
+      };
+    };
+  };
+  offset: number;
+}
+
+const columns: ColumnDef<StockQuote>[] = [
   {
     accessorKey: "symbol",
     header: ({ column }) => {
@@ -35,18 +69,22 @@ const columns: ColumnDef<Symbol>[] = [
     },
   },
   {
-    accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
+    id: "chart",
+    header: "Chart",
+    cell: () => (
+      <Button variant="ghost" size="sm">
+        <TrendingUp className="h-4 w-4" />
+      </Button>
+    ),
+  },
+  {
+    id: "action",
+    header: "Action",
+    cell: () => (
+      <Button variant="ghost" size="sm">
+        Trade
+      </Button>
+    ),
   },
   {
     accessorKey: "lastPrice",
@@ -56,12 +94,15 @@ const columns: ColumnDef<Symbol>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Last Price
+          LTP (₹)
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: () => "--",
+    cell: ({ row }) => {
+      const value = row.getValue("lastPrice") as number;
+      return value ? `${value.toFixed(2)}` : "--";
+    },
   },
   {
     accessorKey: "change",
@@ -71,12 +112,20 @@ const columns: ColumnDef<Symbol>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Change
+          Change (₹)
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: () => "--",
+    cell: ({ row }) => {
+      const value = row.getValue("change") as number;
+      const formattedValue = value ? `${value.toFixed(2)}` : "--";
+      return (
+        <div className={value >= 0 ? "text-green-600" : "text-red-600"}>
+          {formattedValue}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "changePercent",
@@ -86,12 +135,128 @@ const columns: ColumnDef<Symbol>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Change %
+          Change (%)
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: () => "--",
+    cell: ({ row }) => {
+      const value = row.getValue("changePercent") as number;
+      const formattedValue = value ? `${value.toFixed(2)}%` : "--";
+      return (
+        <div className={value >= 0 ? "text-green-600" : "text-red-600"}>
+          {formattedValue}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "openPrice",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Open (₹)
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const value = row.getValue("openPrice") as number;
+      return value ? `${value.toFixed(2)}` : "--";
+    },
+  },
+  {
+    accessorKey: "highPrice",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          High (₹)
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const value = row.getValue("highPrice") as number;
+      return value ? `${value.toFixed(2)}` : "--";
+    },
+  },
+  {
+    accessorKey: "lowPrice",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Low (₹)
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const value = row.getValue("lowPrice") as number;
+      return value ? `${value.toFixed(2)}` : "--";
+    },
+  },
+  {
+    accessorKey: "closePrice",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Close (₹)
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const value = row.getValue("closePrice") as number;
+      return value ? `${value.toFixed(2)}` : "--";
+    },
+  },
+  {
+    accessorKey: "volume",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Volume
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const value = row.getValue("volume") as number;
+      return value ? value.toLocaleString() : "--";
+    },
+  },
+  {
+    accessorKey: "timestamp",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Updated On
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const value = row.getValue("timestamp") as string;
+      return value ? new Date(value).toLocaleString() : "--";
+    },
   },
 ];
 
@@ -99,6 +264,7 @@ export default function TradingPage() {
   const { user } = useAuth();
   const [selectedWatchlist, setSelectedWatchlist] = useState<string>("");
   const [filter, setFilter] = useState<FilterType>("all");
+  const [stockData, setStockData] = useState<StockQuote[]>([]);
 
   // Fetch watchlists
   const { watchlists, isLoading: isLoadingWatchlists } = useWatchlists();
@@ -106,7 +272,6 @@ export default function TradingPage() {
   // Set initial watchlist when data is loaded
   useEffect(() => {
     if (watchlists.length > 0 && !selectedWatchlist) {
-      // Setting initial watchlist
       setSelectedWatchlist(watchlists[0].id);
     }
   }, [watchlists]);
@@ -114,6 +279,66 @@ export default function TradingPage() {
   // Fetch symbols for selected watchlist
   const { symbols, isLoading: isLoadingSymbols } =
     useWatchlistSymbols(selectedWatchlist);
+
+  // Handle WebSocket updates
+  useEffect(() => {
+    const handleStockUpdate = (data: any) => {
+      setStockData((prevData) => {
+        const newData = [...prevData];
+        Object.entries(data).forEach(([symbol, quote]: [string, any]) => {
+          const existingIndex = newData.findIndex(
+            (item) => item.symbol === symbol
+          );
+
+          const LastTradedPrice = quote.LastTradedPrice / 100;
+          const ClosePrice = quote.ClosePrice / 100;
+          const OpenPrice = quote.OpenPrice / 100;
+          const HighPrice = quote.HighPrice / 100;
+          const LowPrice = quote.LowPrice / 100;
+          const VolumeTradedToday = quote.VolumeTradedToday;
+          const stockQuote: StockQuote = {
+            symbol,
+            name: symbol,
+            lastPrice: LastTradedPrice,
+            change: LastTradedPrice - ClosePrice,
+            changePercent: ((LastTradedPrice - ClosePrice) / ClosePrice) * 100,
+            openPrice: OpenPrice,
+            highPrice: HighPrice,
+            lowPrice: LowPrice,
+            closePrice: ClosePrice,
+            volume: VolumeTradedToday,
+            timestamp: new Date(
+              quote.ExchangeFeedTimeEpochMillis
+            ).toISOString(),
+          };
+
+          if (existingIndex >= 0) {
+            newData[existingIndex] = stockQuote;
+          } else {
+            newData.push(stockQuote);
+          }
+        });
+        return newData;
+      });
+    };
+
+    // Subscribe to WebSocket updates
+    const handlePublication = (ctx: WebSocketContext) => {
+      if (ctx.channel.includes("watchlist")) {
+        handleStockUpdate(ctx.data.data);
+      }
+    };
+
+    websocketService.on("publication", handlePublication);
+
+    // Connect to WebSocket if not already connected
+    websocketService.connect();
+
+    return () => {
+      // Cleanup subscription
+      websocketService.off("publication", handlePublication);
+    };
+  }, []);
 
   const isLoading = isLoadingWatchlists || isLoadingSymbols;
 
@@ -188,7 +413,7 @@ export default function TradingPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
         </div>
       ) : (
-        <DataTable columns={columns} data={symbols} searchKey="symbol" />
+        <DataTable columns={columns} data={stockData} searchKey="symbol" />
       )}
     </div>
   );
