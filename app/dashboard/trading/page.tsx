@@ -432,9 +432,7 @@ export default function TradingPage() {
     <div className="space-y-6">
       {/* Responsive header controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-        <h1 className="text-2xl font-semibold text-gray-900 flex-shrink-0">
-          Trading
-        </h1>
+        <h1 className="heading1 flex-shrink-0">Trading</h1>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
           <select
             value={selectedWatchlist}

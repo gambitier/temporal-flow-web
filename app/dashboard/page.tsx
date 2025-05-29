@@ -33,11 +33,11 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="heading1">
           Welcome back, {user ? `${user.first_name} ${user.last_name}` : "User"}
           !
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="subtitle1 mt-1">
           Here's what's happening with your workflows today.
         </p>
       </div>
@@ -46,22 +46,18 @@ export default function DashboardPage() {
         {stats.map((stat) => (
           <div
             key={stat.name}
-            className="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6"
+            className="relative overflow-hidden rounded-lg bg-card text-card-foreground px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6"
           >
             <dt>
               <div className="absolute rounded-md bg-purple-500 p-3">
                 <stat.icon className="h-6 w-6 text-white" aria-hidden="true" />
               </div>
-              <p className="ml-16 truncate text-sm font-medium text-gray-500">
-                {stat.name}
-              </p>
+              <p className="ml-16 truncate body2 font-medium">{stat.name}</p>
             </dt>
             <dd className="ml-16 flex items-baseline pb-6 sm:pb-7">
-              <p className="text-2xl font-semibold text-gray-900">
-                {stat.value}
-              </p>
+              <p className="heading2">{stat.value}</p>
               <p
-                className={`ml-2 flex items-baseline text-sm font-semibold ${
+                className={`ml-2 flex items-baseline body2 font-semibold ${
                   stat.changeType === "positive"
                     ? "text-green-600"
                     : "text-red-600"
@@ -74,9 +70,9 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="rounded-lg bg-white shadow">
+      <div className="rounded-lg bg-card text-card-foreground shadow">
         <div className="p-6">
-          <h2 className="text-lg font-medium text-gray-900">Recent Activity</h2>
+          <h2 className="heading2">Recent Activity</h2>
           <div className="mt-6">
             <div className="flow-root">
               <ul role="list" className="-mb-8">
@@ -94,15 +90,15 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                         <div>
-                          <p className="text-sm text-gray-500">
+                          <p className="body2">
                             Workflow{" "}
-                            <span className="font-medium text-gray-900">
+                            <span className="font-medium text-foreground">
                               #1234
                             </span>{" "}
                             completed
                           </p>
                         </div>
-                        <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                        <div className="whitespace-nowrap text-right body2">
                           <time dateTime="2024-03-20">3h ago</time>
                         </div>
                       </div>
@@ -123,15 +119,15 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                         <div>
-                          <p className="text-sm text-gray-500">
+                          <p className="body2">
                             New team member{" "}
-                            <span className="font-medium text-gray-900">
+                            <span className="font-medium text-foreground">
                               John Doe
                             </span>{" "}
                             joined
                           </p>
                         </div>
-                        <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                        <div className="whitespace-nowrap text-right body2">
                           <time dateTime="2024-03-19">1d ago</time>
                         </div>
                       </div>

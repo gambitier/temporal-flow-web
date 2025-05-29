@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import AuthCheck from "@/components/auth/AuthCheck";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useTheme } from "@/lib/context/ThemeContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,7 +45,7 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { isDarkMode, toggleTheme } = useTheme();
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
@@ -54,11 +55,6 @@ export default function DashboardLayout({
     } else {
       setIsCollapsed(!isCollapsed);
     }
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle("dark");
   };
 
   // Generate breadcrumbs
@@ -85,7 +81,7 @@ export default function DashboardLayout({
           }`}
         >
           <div
-            className="fixed inset-0 bg-gray-600 bg-opacity-75"
+            className="fixed inset-0 bg-gray-600 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-80"
             onClick={() => setSidebarOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white dark:bg-gray-800">
@@ -144,7 +140,7 @@ export default function DashboardLayout({
         <div
           className={`fixed inset-y-0 left-0 z-30 hidden lg:flex flex-col transition-all duration-300 ${
             isCollapsed ? "w-20" : "w-64"
-          }`}
+          } bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700`}
         >
           <div className="flex min-h-0 flex-1 flex-col border-r border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700">
             <div className="flex h-16 items-center justify-between px-4">
@@ -211,7 +207,7 @@ export default function DashboardLayout({
         <div
           className={`transition-all duration-300 ${
             isCollapsed ? "lg:pl-20" : "lg:pl-64"
-          }`}
+          } bg-gray-50 dark:bg-gray-900 min-h-screen`}
         >
           <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white dark:bg-gray-800 shadow">
             <div className="flex flex-1 items-center px-4">
