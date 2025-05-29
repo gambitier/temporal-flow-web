@@ -94,7 +94,7 @@ const columns: ColumnDef<StockQuote>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          LTP (₹)
+          LTP
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -112,7 +112,7 @@ const columns: ColumnDef<StockQuote>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Change (₹)
+          Change
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -158,7 +158,7 @@ const columns: ColumnDef<StockQuote>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Open (₹)
+          Open
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -176,7 +176,7 @@ const columns: ColumnDef<StockQuote>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          High (₹)
+          High
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -194,7 +194,7 @@ const columns: ColumnDef<StockQuote>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Low (₹)
+          Low
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -212,7 +212,7 @@ const columns: ColumnDef<StockQuote>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Close (₹)
+          Close
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
