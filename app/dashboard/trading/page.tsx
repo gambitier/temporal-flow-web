@@ -479,7 +479,12 @@ export default function TradingPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
         </div>
       ) : (
-        <DataTable columns={columns} data={stockData} searchKey="symbol" />
+        <DataTable
+          columns={columns}
+          data={stockData}
+          searchKey="symbol"
+          tableId="trading-table"
+        />
       )}
     </div>
   );

@@ -43,23 +43,48 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchKey?: string;
+  tableId?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,
+  tableId = "default",
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    () => {
+      if (typeof window !== "undefined") {
+        const savedState = localStorage.getItem(`table-${tableId}-visibility`);
+        if (savedState) {
+          try {
+            return JSON.parse(savedState);
+          } catch (e) {
+            console.error("Error parsing saved column visibility:", e);
+          }
+        }
+      }
+      return {};
+    }
+  );
   const [rowSelection, setRowSelection] = useState({});
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        `table-${tableId}-visibility`,
+        JSON.stringify(columnVisibility)
+      );
+    }
+  }, [columnVisibility, tableId]);
 
   const table = useReactTable({
     data,
