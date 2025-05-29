@@ -10,7 +10,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import { useWatchlists, useWatchlistSymbols } from "@/lib/hooks/useWatchlists";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import websocketService from "@/lib/services/websocket";
@@ -331,6 +331,23 @@ export default function TradingPage() {
   const [selectedWatchlist, setSelectedWatchlist] = useState<string>("");
   const [filter, setFilter] = useState<FilterType>("all");
   const [stockData, setStockData] = useState<StockQuote[]>([]);
+  const [sorting, setSorting] = useState<SortingState>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("trading-table-sorting");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {}
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("trading-table-sorting", JSON.stringify(sorting));
+    }
+  }, [sorting]);
 
   // Filter stocks based on selected filter
   const filteredStocks = stockData.filter((stock) => {
@@ -494,6 +511,8 @@ export default function TradingPage() {
           data={filteredStocks}
           searchKey="symbol"
           tableId="trading-table"
+          sorting={sorting}
+          onSortingChange={setSorting}
         />
       )}
     </div>
