@@ -19,15 +19,15 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Profile</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="heading1">Profile</h1>
+        <p className="subtitle1 mt-1">
           Manage your account settings and preferences.
         </p>
       </div>
 
-      <div className="bg-white shadow sm:rounded-lg">
+      <div className="bg-card text-card-foreground shadow sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <div className="flex items-center space-x-6">
             <div className="relative">
@@ -43,18 +43,15 @@ export default function ProfilePage() {
             </div>
             <div>
               <h2 className="text-lg font-medium text-gray-900">
-                {user?.first_name || "User"}
+                <span className="heading2">{user?.first_name || "User"}</span>
               </h2>
-              <p className="text-sm text-gray-500">{user?.email}</p>
+              <p className="body2">{user?.email}</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-6">
             <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="name" className="block body2 font-medium">
                 Name
               </label>
               <div className="mt-1">
@@ -67,16 +64,13 @@ export default function ProfilePage() {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   disabled={!isEditing}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                 />
               </div>
             </div>
 
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="email" className="block body2 font-medium">
                 Email
               </label>
               <div className="mt-1">
@@ -89,7 +83,7 @@ export default function ProfilePage() {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   disabled={!isEditing}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                 />
               </div>
             </div>

@@ -37,7 +37,7 @@ export default function RegisterPage() {
 
   return (
     <PublicRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Header */}
         <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -54,17 +54,17 @@ export default function RegisterPage() {
 
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-md mx-auto">
-            <Card className="border-0 shadow-lg">
+            <Card className="border-0 shadow-lg bg-card text-card-foreground">
               <CardHeader className="space-y-1">
                 <div className="flex items-center justify-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
                     <TrendingUp className="w-6 h-6 text-white" />
                   </div>
                 </div>
-                <CardTitle className="text-2xl text-center font-bold">
+                <CardTitle className="heading2 text-center">
                   Create an account
                 </CardTitle>
-                <CardDescription className="text-center">
+                <CardDescription className="subtitle1 text-center">
                   Enter your details to get started
                 </CardDescription>
               </CardHeader>
@@ -73,10 +73,7 @@ export default function RegisterPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label
-                        htmlFor="first_name"
-                        className="text-sm font-medium text-gray-700"
-                      >
+                      <label htmlFor="first_name" className="body2 font-medium">
                         First Name
                       </label>
                       <input
@@ -84,7 +81,7 @@ export default function RegisterPage() {
                         name="first_name"
                         type="text"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                         placeholder="John"
                         value={formData.first_name}
                         onChange={handleChange}
@@ -92,10 +89,7 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <label
-                        htmlFor="last_name"
-                        className="text-sm font-medium text-gray-700"
-                      >
+                      <label htmlFor="last_name" className="body2 font-medium">
                         Last Name
                       </label>
                       <input
@@ -103,7 +97,7 @@ export default function RegisterPage() {
                         name="last_name"
                         type="text"
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                         placeholder="Doe"
                         value={formData.last_name}
                         onChange={handleChange}
@@ -112,10 +106,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label
-                      htmlFor="email"
-                      className="text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="email" className="body2 font-medium">
                       Email
                     </label>
                     <input
@@ -123,7 +114,7 @@ export default function RegisterPage() {
                       name="email"
                       type="email"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                       placeholder="john@example.com"
                       value={formData.email}
                       onChange={handleChange}
@@ -131,10 +122,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label
-                      htmlFor="password"
-                      className="text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="password" className="body2 font-medium">
                       Password
                     </label>
                     <input
@@ -142,7 +130,7 @@ export default function RegisterPage() {
                       name="password"
                       type="password"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                       placeholder="Enter your password"
                       value={formData.password}
                       onChange={handleChange}
@@ -193,7 +181,7 @@ export default function RegisterPage() {
                     )}
                   </Button>
 
-                  <p className="text-center text-sm text-gray-600">
+                  <p className="text-center body2">
                     Already have an account?{" "}
                     <Link
                       href="/login"

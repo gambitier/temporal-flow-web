@@ -92,3 +92,27 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .heading1 {
+    @apply text-3xl font-bold text-foreground;
+  }
+  .heading2 {
+    @apply text-2xl font-semibold text-foreground;
+  }
+  .heading3 {
+    @apply text-xl font-semibold text-foreground;
+  }
+  .subtitle1 {
+    @apply text-lg font-medium text-muted-foreground;
+  }
+  .subtitle2 {
+    @apply text-base font-medium text-muted-foreground;
+  }
+  .body1 {
+    @apply text-base text-foreground;
+  }
+  .body2 {
+    @apply text-sm text-muted-foreground;
+  }
+}
