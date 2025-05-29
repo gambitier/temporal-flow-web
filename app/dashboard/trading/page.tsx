@@ -332,6 +332,18 @@ export default function TradingPage() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [stockData, setStockData] = useState<StockQuote[]>([]);
 
+  // Filter stocks based on selected filter
+  const filteredStocks = stockData.filter((stock) => {
+    switch (filter) {
+      case "gainers":
+        return stock.changePercent > 0;
+      case "losers":
+        return stock.changePercent < 0;
+      default:
+        return true;
+    }
+  });
+
   // Fetch watchlists
   const { watchlists, isLoading: isLoadingWatchlists } = useWatchlists();
 
@@ -481,7 +493,7 @@ export default function TradingPage() {
       ) : (
         <DataTable
           columns={columns}
-          data={stockData}
+          data={filteredStocks}
           searchKey="symbol"
           tableId="trading-table"
         />
