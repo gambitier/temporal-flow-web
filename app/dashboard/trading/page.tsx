@@ -454,7 +454,7 @@ export default function TradingPage() {
           <select
             value={selectedWatchlist}
             onChange={(e) => setSelectedWatchlist(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm w-full sm:w-auto"
+            className="body2 rounded-md border border-input bg-card text-foreground shadow-sm focus:border-purple-500 focus:ring-purple-500 w-full sm:w-auto dark:bg-gray-900 dark:text-white dark:border-gray-700"
             disabled={isLoadingWatchlists}
           >
             <option value="">Select a watchlist</option>
@@ -467,7 +467,7 @@ export default function TradingPage() {
           <div className="flex flex-row flex-wrap gap-2 w-full sm:w-auto">
             <button
               onClick={() => setFilter("all")}
-              className={`px-3 py-1 rounded-md text-sm font-medium w-full sm:w-auto ${
+              className={`body2 px-3 py-1 rounded-md font-medium w-full sm:w-auto ${
                 filter === "all"
                   ? "bg-purple-100 text-purple-700"
                   : "text-gray-500 hover:text-gray-700"
@@ -477,7 +477,7 @@ export default function TradingPage() {
             </button>
             <button
               onClick={() => setFilter("gainers")}
-              className={`px-3 py-1 rounded-md text-sm font-medium flex items-center w-full sm:w-auto ${
+              className={`body2 px-3 py-1 rounded-md font-medium flex items-center w-full sm:w-auto ${
                 filter === "gainers"
                   ? "bg-green-100 text-green-700"
                   : "text-gray-500 hover:text-gray-700"
@@ -488,7 +488,7 @@ export default function TradingPage() {
             </button>
             <button
               onClick={() => setFilter("losers")}
-              className={`px-3 py-1 rounded-md text-sm font-medium flex items-center w-full sm:w-auto ${
+              className={`body2 px-3 py-1 rounded-md font-medium flex items-center w-full sm:w-auto ${
                 filter === "losers"
                   ? "bg-red-100 text-red-700"
                   : "text-gray-500 hover:text-gray-700"
