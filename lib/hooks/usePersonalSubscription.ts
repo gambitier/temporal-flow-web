@@ -80,23 +80,23 @@ export function usePersonalSubscription() {
             const subscription = websocketService.createSubscription(channel, token);
             currentSubscription.current = channel;
 
-            subscription.on("subscribing", (ctx) => {
+            subscription.on("subscribing", (ctx: any) => {
                 console.log("Subscribing to personal channel:", ctx);
             });
 
-            subscription.on("subscribed", (ctx) => {
+            subscription.on("subscribed", (ctx: any) => {
                 console.log("Subscribed to personal channel:", ctx);
             });
 
-            subscription.on("unsubscribed", (ctx) => {
+            subscription.on("unsubscribed", (ctx: any) => {
                 console.log("Unsubscribed from personal channel:", ctx);
             });
 
-            subscription.on("error", (ctx) => {
+            subscription.on("error", (ctx: any) => {
                 console.error("Personal subscription error:", ctx);
             });
 
-            subscription.on("publication", (ctx) => {
+            subscription.on("publication", (ctx: any) => {
                 console.log("Received personal update:", ctx);
                 // Handle personal updates here
             });

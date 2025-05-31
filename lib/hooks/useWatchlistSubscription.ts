@@ -72,23 +72,23 @@ export function useWatchlistSubscription() {
             const subscription = websocketService.createSubscription(channel, token);
             currentSubscription.current = channel;
 
-            subscription.on("subscribing", (ctx) => {
+            subscription.on("subscribing", (ctx: any) => {
                 console.log("Subscribing to channel:", channel, ctx);
             });
 
-            subscription.on("subscribed", (ctx) => {
+            subscription.on("subscribed", (ctx: any) => {
                 console.log("Subscribed to channel:", channel, ctx);
             });
 
-            subscription.on("unsubscribed", (ctx) => {
+            subscription.on("unsubscribed", (ctx: any) => {
                 console.log("Unsubscribed from channel:", channel, ctx);
             });
 
-            subscription.on("error", (ctx) => {
+            subscription.on("error", (ctx: any) => {
                 console.error("Subscription error for channel:", channel, ctx);
             });
 
-            subscription.on("publication", (ctx) => {
+            subscription.on("publication", (ctx: any) => {
                 console.log("Received watchlist update for channel:", channel, ctx);
                 // Handle watchlist updates here
             });
