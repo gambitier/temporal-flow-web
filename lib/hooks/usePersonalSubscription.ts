@@ -18,7 +18,6 @@ export function usePersonalSubscription() {
 
     const getSubscriptionToken = useMutation({
         mutationFn: async () => {
-            console.log("Requesting personal subscription token");
             const personalChannel = "personal";
             const token = localStorage.getItem("token");
             if (!token) {
@@ -40,7 +39,6 @@ export function usePersonalSubscription() {
             }
 
             const data: PersonalSubscriptionToken = await response.json();
-            console.log("Received personal subscription token response:", data);
 
             if (!data.accessToken) {
                 throw new Error("No token in personal subscription response");
@@ -63,7 +61,6 @@ export function usePersonalSubscription() {
 
             // Get new subscription token
             const token = await getSubscriptionToken.mutateAsync();
-            console.log("Got personal subscription token:", token);
 
             // Get user ID from token
             const accessToken = localStorage.getItem("accessToken");
