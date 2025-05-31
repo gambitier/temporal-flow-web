@@ -11,8 +11,6 @@ import {
   X,
   LogOut,
   LineChart,
-  ChevronLeft,
-  ChevronRight,
   Search,
   Bell,
   Sun,
@@ -37,6 +35,60 @@ const navigation = [
   { name: "Profile", href: "/dashboard/profile", icon: User },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
+
+// Sidebar navigation extracted to avoid duplication
+function SidebarNav({
+  pathname,
+  logout,
+  isCollapsed,
+}: {
+  pathname: string;
+  logout: () => void;
+  isCollapsed?: boolean;
+}) {
+  return (
+    <>
+      {navigation.map((item) => {
+        const isActive = pathname === item.href;
+        return (
+          <Link
+            key={item.name}
+            href={item.href}
+            className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+              isActive
+                ? "bg-purple-50 text-purple-600 dark:bg-purple-900 dark:text-purple-200"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+            } ${isCollapsed ? "justify-center" : ""}`}
+            title={isCollapsed ? item.name : ""}
+          >
+            <item.icon
+              className={`h-5 w-5 ${
+                isActive
+                  ? "text-purple-600 dark:text-purple-200"
+                  : "text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300"
+              } ${!isCollapsed ? "mr-3" : ""}`}
+            />
+            {!isCollapsed && item.name}
+          </Link>
+        );
+      })}
+      <button
+        onClick={logout}
+        className={`w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white ${
+          isCollapsed ? "justify-center" : ""
+        }`}
+        title={isCollapsed ? "Logout" : ""}
+      >
+        <LogOut
+          className={`h-5 w-5 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300 ${
+            !isCollapsed ? "mr-3" : ""
+          }`}
+        />
+        {!isCollapsed && "Logout"}
+      </button>
+    </>
+  );
+}
 
 export default function DashboardLayout({
   children,
@@ -102,36 +154,7 @@ export default function DashboardLayout({
               </button>
             </div>
             <nav className="flex-1 space-y-1 px-2 py-4">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                      isActive
-                        ? "bg-purple-50 text-purple-600 dark:bg-purple-900 dark:text-purple-200"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
-                    }`}
-                  >
-                    <item.icon
-                      className={`mr-3 h-5 w-5 ${
-                        isActive
-                          ? "text-purple-600 dark:text-purple-200"
-                          : "text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300"
-                      }`}
-                    />
-                    {item.name}
-                  </Link>
-                );
-              })}
-              <button
-                onClick={logout}
-                className="w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                <LogOut className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300" />
-                Logout
-              </button>
+              <SidebarNav pathname={pathname} logout={logout} />
             </nav>
           </div>
         </div>
@@ -161,44 +184,11 @@ export default function DashboardLayout({
               </Link>
             </div>
             <nav className="flex-1 space-y-1 px-2 py-4">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                      isActive
-                        ? "bg-purple-50 text-purple-600 dark:bg-purple-900 dark:text-purple-200"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
-                    } ${isCollapsed ? "justify-center" : ""}`}
-                    title={isCollapsed ? item.name : ""}
-                  >
-                    <item.icon
-                      className={`h-5 w-5 ${
-                        isActive
-                          ? "text-purple-600 dark:text-purple-200"
-                          : "text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300"
-                      } ${!isCollapsed ? "mr-3" : ""}`}
-                    />
-                    {!isCollapsed && item.name}
-                  </Link>
-                );
-              })}
-              <button
-                onClick={logout}
-                className={`w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white ${
-                  isCollapsed ? "justify-center" : ""
-                }`}
-                title={isCollapsed ? "Logout" : ""}
-              >
-                <LogOut
-                  className={`h-5 w-5 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300 ${
-                    !isCollapsed ? "mr-3" : ""
-                  }`}
-                />
-                {!isCollapsed && "Logout"}
-              </button>
+              <SidebarNav
+                pathname={pathname}
+                logout={logout}
+                isCollapsed={isCollapsed}
+              />
             </nav>
           </div>
         </div>
@@ -211,25 +201,14 @@ export default function DashboardLayout({
         >
           <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white dark:bg-gray-800 shadow">
             <div className="flex flex-1 items-center px-4">
+              {/* Hamburger button for both mobile and desktop */}
               <button
                 type="button"
-                className="text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 lg:hidden"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <span className="sr-only">Open sidebar</span>
-                <Menu className="h-6 w-6" />
-              </button>
-              <button
-                type="button"
-                className="hidden lg:block px-4 text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
+                className="px-4 text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
                 onClick={toggleSidebar}
               >
                 <span className="sr-only">Toggle sidebar</span>
-                {isCollapsed ? (
-                  <ChevronRight className="h-6 w-6" />
-                ) : (
-                  <ChevronLeft className="h-6 w-6" />
-                )}
+                <Menu className="h-6 w-6" />
               </button>
 
               {/* Breadcrumbs */}
