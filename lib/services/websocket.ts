@@ -1,4 +1,4 @@
-import { Centrifuge, Subscription } from 'centrifuge';
+import { Centrifuge } from 'centrifuge';
 
 type EventCallback = (ctx: any) => void;
 
@@ -6,7 +6,6 @@ class WebSocketService {
     private centrifuge: Centrifuge | null = null;
     private isConnecting: boolean = false;
     private eventHandlers: Map<string, EventCallback[]> = new Map();
-    private subscriptions: Map<string, Subscription> = new Map();
 
     constructor() {
         // Remove automatic connection from constructor
@@ -95,65 +94,18 @@ class WebSocketService {
             throw new Error(`Error creating subscription for channel: ${channel} | Error: Token is empty or undefined or null`);
         }
 
-        // Check if subscription already exists
-        if (this.subscriptions.has(channel)) {
-            console.log("Subscription already exists for channel:", channel);
-            // Instead of returning the existing subscription, unsubscribe and create a new one
-            this.unsubscribe(channel);
-        }
-
-        console.log("existing subscriptions:", this.subscriptions);
-
         const subscription = this.centrifuge.newSubscription(channel, {
             token,
             recoverable: true,
             positioned: true
         });
 
-        // Add event handlers to track subscription state
-        subscription.on("subscribing", (ctx) => {
-            console.log("Subscribing to channel:", channel, ctx);
-        });
-
-        subscription.on("subscribed", (ctx) => {
-            console.log("Subscribed to channel:", channel, ctx);
-        });
-
-        subscription.on("unsubscribed", (ctx) => {
-            console.log("Unsubscribed from channel:", channel, ctx);
-            // Remove from subscriptions map when unsubscribed
-            this.subscriptions.delete(channel);
-        });
-
-        subscription.on("error", (error) => {
-            console.error("Subscription error for channel:", channel, error);
-            // Remove from subscriptions map on error
-            this.subscriptions.delete(channel);
-        });
-
-        this.subscriptions.set(channel, subscription);
         return subscription;
-    }
-
-    public unsubscribe(channel: string) {
-        const subscription = this.subscriptions.get(channel);
-        if (subscription) {
-            console.log("Unsubscribing from channel:", channel);
-            subscription.unsubscribe();
-            // Remove from subscriptions map immediately
-            this.subscriptions.delete(channel);
-        }
     }
 
     disconnect() {
         if (this.centrifuge) {
             console.log("Disconnecting WebSocket");
-            // Unsubscribe from all channels first
-            this.subscriptions.forEach((subscription, channel) => {
-                console.log("Unsubscribing from channel before disconnect:", channel);
-                subscription.unsubscribe();
-            });
-            this.subscriptions.clear();
             this.centrifuge.disconnect();
             this.centrifuge = null;
         }

@@ -136,6 +136,7 @@ export function useAuth() {
 
     const logout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("accessToken");
         setUser(null);
         websocketService.disconnect();
         router.push("/login");

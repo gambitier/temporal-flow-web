@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 import websocketService from "@/lib/services/websocket";
 import { jwtDecode } from "jwt-decode";
 
@@ -14,8 +14,6 @@ interface JwtPayload {
 }
 
 export function usePersonalSubscription() {
-    const currentSubscription = useRef<string | null>(null);
-
     const getSubscriptionToken = useMutation({
         mutationFn: async () => {
             const personalChannel = "personal";
@@ -52,13 +50,6 @@ export function usePersonalSubscription() {
         try {
             console.log("Subscribing to personal channel");
 
-            // Unsubscribe from current personal subscription if exists
-            if (currentSubscription.current) {
-                console.log("Unsubscribing from current personal channel:", currentSubscription.current);
-                websocketService.unsubscribe(currentSubscription.current);
-                currentSubscription.current = null;
-            }
-
             // Get new subscription token
             const token = await getSubscriptionToken.mutateAsync();
 
@@ -75,7 +66,6 @@ export function usePersonalSubscription() {
             const channel = `personal:${userId}`;
             console.log("Creating subscription for personal channel:", channel);
             const subscription = websocketService.createSubscription(channel, token);
-            currentSubscription.current = channel;
 
             subscription.on("subscribing", (ctx: any) => {
                 console.log("Subscribing to personal channel:", ctx);
@@ -105,17 +95,6 @@ export function usePersonalSubscription() {
             throw error;
         }
     }, [getSubscriptionToken]);
-
-    // Cleanup subscription on unmount
-    useEffect(() => {
-        return () => {
-            if (currentSubscription.current) {
-                console.log("Cleaning up personal subscription for channel:", currentSubscription.current);
-                websocketService.unsubscribe(currentSubscription.current);
-                currentSubscription.current = null;
-            }
-        };
-    }, []);
 
     return {
         subscribeToPersonal,
