@@ -14,6 +14,7 @@ interface SubscriptionTokenResponse {
 interface ConnectionData {
     wsUrl: string;
     subscriptionToken: string;
+    accessToken: string;
 }
 
 async function getWebSocketInfo(token: string): Promise<WebSocketInfo> {
@@ -76,8 +77,8 @@ export function useWebsocketConnection() {
                 return connectionPromise;
             }
 
-            const token = localStorage.getItem("token");
-            if (!token) {
+            const accessToken = localStorage.getItem("accessToken");
+            if (!accessToken) {
                 throw new Error("No authentication token found");
             }
 
@@ -85,13 +86,14 @@ export function useWebsocketConnection() {
             connectionPromise = (async () => {
                 try {
                     const [info, subscriptionTokenData] = await Promise.all([
-                        getWebSocketInfo(token),
-                        getSubscriptionToken(token)
+                        getWebSocketInfo(accessToken),
+                        getSubscriptionToken(accessToken)
                     ]);
 
                     return {
                         wsUrl: info.ws_url,
-                        subscriptionToken: subscriptionTokenData.accessToken
+                        subscriptionToken: subscriptionTokenData.accessToken,
+                        accessToken: accessToken
                     };
                 } finally {
                     isConnecting = false;
@@ -103,7 +105,7 @@ export function useWebsocketConnection() {
         },
         onSuccess: (data) => {
             if (data) {
-                websocketService.connect(data.wsUrl, data.subscriptionToken);
+                websocketService.connect(data.wsUrl, data.accessToken);
             }
         },
         onError: (error) => {

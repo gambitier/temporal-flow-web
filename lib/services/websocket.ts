@@ -6,6 +6,7 @@ class WebSocketService {
     private centrifuge: Centrifuge | null = null;
     private isConnecting: boolean = false;
     private eventHandlers: Map<string, EventCallback[]> = new Map();
+    private subscriptions: Map<string, any> = new Map();
 
     constructor() {
         // Remove automatic connection from constructor
@@ -90,13 +91,34 @@ class WebSocketService {
         if (!this.centrifuge) {
             throw new Error("WebSocket not connected");
         }
-        return this.centrifuge.newSubscription(channel, { token });
+        if (token === "" || token === null || token === undefined) {
+            throw new Error(`Error creating subscription for channel: ${channel} | Error: Token is empty or undefined or null`);
+        }
+        console.log("Creating subscription for channel:", channel, "with token:", token);
+        const subscription = this.centrifuge.newSubscription(channel, {
+            token,
+            recoverable: true,
+            positioned: true
+        });
+        this.subscriptions.set(channel, subscription);
+        return subscription;
+    }
+
+    public unsubscribe(channel: string) {
+        const subscription = this.subscriptions.get(channel);
+        if (subscription) {
+            console.log("Unsubscribing from channel:", channel);
+            subscription.unsubscribe();
+            this.subscriptions.delete(channel);
+        }
     }
 
     disconnect() {
         if (this.centrifuge) {
+            console.log("Disconnecting WebSocket");
             this.centrifuge.disconnect();
             this.centrifuge = null;
+            this.subscriptions.clear();
         }
     }
 }

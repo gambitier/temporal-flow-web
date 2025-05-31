@@ -113,6 +113,8 @@ export function useAuth() {
     const loginMutation = useMutation({
         mutationFn: loginUser,
         onSuccess: async (data) => {
+            localStorage.setItem("tokenType", data.tokenType);
+            localStorage.setItem("accessToken", data.accessToken);
             const token = `${data.tokenType} ${data.accessToken}`;
             localStorage.setItem("token", token);
             const userData = await fetchUserData(token);
