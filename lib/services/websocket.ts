@@ -35,54 +35,12 @@ class WebSocketService {
         }
     }
 
-    public async connect() {
+    public connect(wsUrl: string, subscriptionToken: string) {
         if (this.isConnecting || this.centrifuge) return;
 
         try {
             this.isConnecting = true;
-            const token = localStorage.getItem("token");
-            if (!token) {
-                throw new Error("No authentication token found");
-            }
-
-            console.log("Fetching WebSocket info...");
-            const response = await fetch("http://localhost:8085/api/v1/ws/info", {
-                headers: {
-                    "Authorization": token,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to get connection info");
-            }
-
-            const info = await response.json();
-            console.log("WebSocket info:", info);
-
-            if (!info.ws_url) {
-                throw new Error("WebSocket URL not provided in server response");
-            }
-
-            console.log("Fetching subscription token...");
-            const subscriptionTokenResponse = await fetch(
-                "http://localhost:8085/api/v1/ws/token/subscription",
-                {
-                    headers: {
-                        "Authorization": token,
-                    },
-                }
-            );
-
-            if (!subscriptionTokenResponse.ok) {
-                throw new Error("Failed to get subscription token");
-            }
-
-            const subscriptionTokenData = await subscriptionTokenResponse.json();
-            const subscriptionToken = subscriptionTokenData.accessToken;
-            console.log("Subscription token:", subscriptionToken);
-
-            const wsUrl = info.ws_url;
-            console.log("WebSocket URL:", wsUrl);
+            console.log("Connecting to WebSocket...", wsUrl);
 
             this.centrifuge = new Centrifuge(wsUrl, {
                 token: subscriptionToken,
@@ -120,7 +78,6 @@ class WebSocketService {
                 console.log("Received publication:", ctx);
             });
 
-            console.log("Connecting to WebSocket...");
             this.centrifuge.connect();
         } catch (error) {
             console.error("Error connecting to WebSocket:", error);
