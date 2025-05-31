@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import websocketService from "@/lib/services/websocket";
 
 interface WatchlistSubscriptionToken {
@@ -9,11 +9,11 @@ interface WatchlistSubscriptionToken {
 }
 
 export function useWatchlistSubscription() {
-    const currentSubscription = useRef<string | null>(null);
+    const [currentWatchlistId, setCurrentWatchlistId] = useState<string | null>(null);
+    const [isSubscribing, setIsSubscribing] = useState(false);
 
     const getSubscriptionToken = useMutation({
         mutationFn: async (watchlistId: string) => {
-            console.log("Requesting subscription token for watchlist:", watchlistId);
             const watchlistChannel = "watchlist";
             const token = localStorage.getItem("token");
             if (!token) {
@@ -36,7 +36,6 @@ export function useWatchlistSubscription() {
             }
 
             const data: WatchlistSubscriptionToken = await response.json();
-            console.log("Received subscription token response:", data);
 
             if (!data.accessToken) {
                 throw new Error("No token in subscription response");
@@ -52,25 +51,29 @@ export function useWatchlistSubscription() {
             return;
         }
 
+        // If we're already subscribing to this watchlist, don't try again
+        if (isSubscribing && currentWatchlistId === watchlistId) {
+            console.log("Already subscribing to watchlist:", watchlistId);
+            return;
+        }
+
         try {
+            setIsSubscribing(true);
             console.log("Subscribing to watchlist:", watchlistId);
 
             // Unsubscribe from current watchlist if exists
-            if (currentSubscription.current) {
-                console.log("Unsubscribing from current watchlist:", currentSubscription.current);
-                websocketService.unsubscribe(currentSubscription.current);
-                currentSubscription.current = null;
+            if (currentWatchlistId) {
+                console.log("Unsubscribing from current watchlist:", currentWatchlistId);
+                websocketService.unsubscribe(`watchlist:${currentWatchlistId}`);
             }
 
             // Get new subscription token
             const token = await getSubscriptionToken.mutateAsync(watchlistId);
-            console.log("Got token for watchlist:", watchlistId, "Token:", token);
 
             // Subscribe to new watchlist
             const channel = `watchlist:${watchlistId}`;
             console.log("Creating subscription for channel:", channel);
             const subscription = websocketService.createSubscription(channel, token);
-            currentSubscription.current = channel;
 
             subscription.on("subscribing", (ctx: any) => {
                 console.log("Subscribing to channel:", channel, ctx);
@@ -78,14 +81,23 @@ export function useWatchlistSubscription() {
 
             subscription.on("subscribed", (ctx: any) => {
                 console.log("Subscribed to channel:", channel, ctx);
+                setCurrentWatchlistId(watchlistId);
+                setIsSubscribing(false);
             });
 
             subscription.on("unsubscribed", (ctx: any) => {
                 console.log("Unsubscribed from channel:", channel, ctx);
+                if (currentWatchlistId === watchlistId) {
+                    setCurrentWatchlistId(null);
+                }
             });
 
             subscription.on("error", (ctx: any) => {
                 console.error("Subscription error for channel:", channel, ctx);
+                setIsSubscribing(false);
+                if (currentWatchlistId === watchlistId) {
+                    setCurrentWatchlistId(null);
+                }
             });
 
             subscription.on("publication", (ctx: any) => {
@@ -97,24 +109,28 @@ export function useWatchlistSubscription() {
             console.log("Successfully subscribed to watchlist:", watchlistId);
         } catch (error) {
             console.error("Error subscribing to watchlist:", watchlistId, error);
+            setIsSubscribing(false);
+            if (currentWatchlistId === watchlistId) {
+                setCurrentWatchlistId(null);
+            }
             throw error;
         }
-    }, [getSubscriptionToken]);
+    }, [currentWatchlistId, getSubscriptionToken, isSubscribing]);
 
     // Cleanup subscription on unmount
     useEffect(() => {
         return () => {
-            if (currentSubscription.current) {
-                console.log("Cleaning up subscription for channel:", currentSubscription.current);
-                websocketService.unsubscribe(currentSubscription.current);
-                currentSubscription.current = null;
+            if (currentWatchlistId) {
+                console.log("Cleaning up subscription for channel:", `watchlist:${currentWatchlistId}`);
+                websocketService.unsubscribe(`watchlist:${currentWatchlistId}`);
+                setCurrentWatchlistId(null);
             }
         };
-    }, []);
+    }, [currentWatchlistId]);
 
     return {
         subscribeToWatchlist,
-        isSubscribing: getSubscriptionToken.isPending,
+        isSubscribing: isSubscribing || getSubscriptionToken.isPending,
         error: getSubscriptionToken.error,
     };
 } 
