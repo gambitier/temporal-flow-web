@@ -114,7 +114,7 @@ export default function DashboardPage() {
                           aria-hidden="true"
                         />
                       )}
-                      <div className="relative flex space-x-3">
+                      <div className="relative flex space-x-5">
                         <div>
                           <span
                             className={`h-8 w-8 rounded-full ${activity.iconBg} flex items-center justify-center ring-8 ring-white`}
