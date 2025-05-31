@@ -100,7 +100,6 @@ export function useWatchlistSubscription() {
             });
 
             subscription.subscribe();
-            console.log("Successfully subscribed to watchlist:", watchlistId);
         } catch (error) {
             console.error("Error subscribing to watchlist:", watchlistId, error);
             setIsSubscribing(false);
