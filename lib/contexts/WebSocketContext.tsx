@@ -25,8 +25,9 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (!token) return;
-
+    if (!token) {
+      return;
+    }
     const handleConnect = async () => {
       try {
         await connect();

@@ -61,12 +61,6 @@ export function useWatchlistSubscription() {
             setIsSubscribing(true);
             console.log("Subscribing to watchlist:", watchlistId);
 
-            // Unsubscribe from current watchlist if exists
-            if (currentWatchlistId) {
-                console.log("Unsubscribing from current watchlist:", currentWatchlistId);
-                websocketService.unsubscribe(`watchlist:${currentWatchlistId}`);
-            }
-
             // Get new subscription token
             const token = await getSubscriptionToken.mutateAsync(watchlistId);
 
@@ -121,8 +115,6 @@ export function useWatchlistSubscription() {
     useEffect(() => {
         return () => {
             if (currentWatchlistId) {
-                console.log("Cleaning up subscription for channel:", `watchlist:${currentWatchlistId}`);
-                websocketService.unsubscribe(`watchlist:${currentWatchlistId}`);
                 setCurrentWatchlistId(null);
             }
         };
