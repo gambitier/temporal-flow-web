@@ -129,6 +129,13 @@ class WebSocketService {
         }
     }
 
+    public createSubscription(channel: string, token: string) {
+        if (!this.centrifuge) {
+            throw new Error("WebSocket not connected");
+        }
+        return this.centrifuge.newSubscription(channel, { token });
+    }
+
     disconnect() {
         if (this.centrifuge) {
             this.centrifuge.disconnect();
