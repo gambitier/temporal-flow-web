@@ -89,7 +89,6 @@ export function usePersonalSubscription() {
             });
 
             subscription.subscribe();
-            console.log("Successfully subscribed to personal channel");
         } catch (error) {
             console.error("Error subscribing to personal channel:", error);
             throw error;
