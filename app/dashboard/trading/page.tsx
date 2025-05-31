@@ -15,6 +15,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import websocketService from "@/lib/services/websocket";
 import { useWebSocket } from "@/lib/contexts/WebSocketContext";
+import { useWatchlistSubscription } from "@/lib/hooks/useWatchlistSubscription";
 
 type FilterType = "all" | "gainers" | "losers";
 
@@ -335,6 +336,7 @@ export default function TradingPage() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [mounted, setMounted] = useState(false);
   const { isConnected, isConnecting, error } = useWebSocket();
+  const { subscribeToWatchlist, isSubscribing } = useWatchlistSubscription();
 
   // Handle initial sorting state after mount
   useEffect(() => {
@@ -374,9 +376,14 @@ export default function TradingPage() {
   // Set initial watchlist when data is loaded
   useEffect(() => {
     if (watchlists.length > 0 && !selectedWatchlist) {
-      setSelectedWatchlist(watchlists[0].id);
+      const initialWatchlistId = watchlists[0].id;
+      setSelectedWatchlist(initialWatchlistId);
+      // Subscribe to initial watchlist
+      subscribeToWatchlist(initialWatchlistId).catch((error) => {
+        console.error("Failed to subscribe to initial watchlist:", error);
+      });
     }
-  }, [watchlists]);
+  }, [watchlists, selectedWatchlist, subscribeToWatchlist]);
 
   // Fetch symbols for selected watchlist
   const { symbols, isLoading: isLoadingSymbols } =
@@ -443,6 +450,18 @@ export default function TradingPage() {
 
   const isLoading = isLoadingWatchlists || isLoadingSymbols;
 
+  // Handle watchlist selection
+  const handleWatchlistChange = async (watchlistId: string) => {
+    if (!watchlistId) return;
+
+    try {
+      setSelectedWatchlist(watchlistId);
+      await subscribeToWatchlist(watchlistId);
+    } catch (error) {
+      console.error("Failed to subscribe to watchlist:", error);
+    }
+  };
+
   if (!mounted) {
     return null; // Return null on server-side and first render
   }
@@ -461,19 +480,28 @@ export default function TradingPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
         <h1 className="heading1 flex-shrink-0">Trading</h1>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
-          <select
-            value={selectedWatchlist}
-            onChange={(e) => setSelectedWatchlist(e.target.value)}
-            className="body2 rounded-md border border-input bg-card text-foreground shadow-sm focus:border-purple-500 focus:ring-purple-500 w-full sm:w-auto dark:bg-gray-900 dark:text-white dark:border-gray-700"
-            disabled={isLoadingWatchlists}
-          >
-            <option value="">Select a watchlist</option>
-            {watchlists.map((watchlist) => (
-              <option key={watchlist.id} value={watchlist.id}>
-                {watchlist.name}
-              </option>
-            ))}
-          </select>
+          <div className="mb-4">
+            <label
+              htmlFor="watchlist"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Select Watchlist
+            </label>
+            <select
+              id="watchlist"
+              value={selectedWatchlist}
+              onChange={(e) => handleWatchlistChange(e.target.value)}
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300"
+              disabled={isSubscribing}
+            >
+              <option value="">Select a watchlist</option>
+              {watchlists.map((watchlist) => (
+                <option key={watchlist.id} value={watchlist.id}>
+                  {watchlist.name}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="flex flex-row flex-wrap gap-2 w-full sm:w-auto">
             <button
               onClick={() => setFilter("all")}
