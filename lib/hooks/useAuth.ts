@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import config from "@/lib/config";
 import websocketService from "@/lib/services/websocket";
+import { useWebsocketConnection } from './useWebsocketConnection';
 
 interface LoginCredentials {
     email: string;
@@ -75,21 +76,37 @@ const fetchUserData = async (token: string): Promise<User> => {
     });
 
     if (!response.ok) {
-        throw new Error("Failed to fetch user data");
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || "Failed to fetch user data");
     }
 
-    return response.json();
+    const data = await response.json();
+    if (!data.id || !data.email) {
+        throw new Error("Invalid user data received");
+    }
+
+    return data;
 };
 
 export function useAuth() {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
+    const { connect: connectWebSocket, isError: isWebSocketError } = useWebsocketConnection();
 
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
-            fetchUserData(token).then(setUser);
-            websocketService.connect();
+            fetchUserData(token)
+                .then(setUser)
+                .catch((error) => {
+                    console.error("Error fetching user data on mount:", error);
+                    // If user data fetch fails, clear the token and redirect to login
+                    localStorage.removeItem("token");
+                    router.push("/login");
+                });
+
+            // Only attempt WebSocket connection if we have a token
+            connectWebSocket();
         }
     }, []);
 
@@ -100,9 +117,12 @@ export function useAuth() {
             localStorage.setItem("token", token);
             const userData = await fetchUserData(token);
             setUser(userData);
-            await websocketService.connect();
+            connectWebSocket();
             router.push("/dashboard");
         },
+        onError: (error) => {
+            console.error("Login failed:", error);
+        }
     });
 
     const registerMutation = useMutation({

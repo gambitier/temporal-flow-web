@@ -14,6 +14,7 @@ import { ColumnDef, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import websocketService from "@/lib/services/websocket";
+import { useWebSocket } from "@/lib/contexts/WebSocketContext";
 
 type FilterType = "all" | "gainers" | "losers";
 
@@ -331,23 +332,29 @@ export default function TradingPage() {
   const [selectedWatchlist, setSelectedWatchlist] = useState<string>("");
   const [filter, setFilter] = useState<FilterType>("all");
   const [stockData, setStockData] = useState<StockQuote[]>([]);
-  const [sorting, setSorting] = useState<SortingState>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("trading-table-sorting");
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {}
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [mounted, setMounted] = useState(false);
+  const { isConnected, isConnecting, error } = useWebSocket();
+
+  // Handle initial sorting state after mount
+  useEffect(() => {
+    const saved = localStorage.getItem("trading-table-sorting");
+    if (saved) {
+      try {
+        setSorting(JSON.parse(saved));
+      } catch (e) {
+        console.error("Error parsing saved sorting state:", e);
       }
     }
-    return [];
-  });
+    setMounted(true);
+  }, []);
 
+  // Save sorting state
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (mounted) {
       localStorage.setItem("trading-table-sorting", JSON.stringify(sorting));
     }
-  }, [sorting]);
+  }, [sorting, mounted]);
 
   // Filter stocks based on selected filter
   const filteredStocks = stockData.filter((stock) => {
@@ -377,6 +384,8 @@ export default function TradingPage() {
 
   // Handle WebSocket updates
   useEffect(() => {
+    if (!mounted || !isConnected) return;
+
     const handleStockUpdate = (data: any) => {
       setStockData((prevData) => {
         const newData = [...prevData];
@@ -426,16 +435,17 @@ export default function TradingPage() {
 
     websocketService.on("publication", handlePublication);
 
-    // Connect to WebSocket if not already connected
-    websocketService.connect();
-
     return () => {
       // Cleanup subscription
       websocketService.off("publication", handlePublication);
     };
-  }, []);
+  }, [mounted, isConnected]);
 
   const isLoading = isLoadingWatchlists || isLoadingSymbols;
+
+  if (!mounted) {
+    return null; // Return null on server-side and first render
+  }
 
   if (isLoadingWatchlists) {
     return (
