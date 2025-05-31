@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import websocketService from "@/lib/services/websocket";
+import { useWebsocketConnection } from "@/lib/hooks/useWebsocketConnection";
+import { usePersonalSubscription } from "@/lib/hooks/usePersonalSubscription";
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -17,107 +18,56 @@ const WebSocketContext = createContext<WebSocketContextType>({
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const { connect, isConnecting } = useWebsocketConnection();
+  const { subscribeToPersonal, isSubscribing: isPersonalSubscribing } =
+    usePersonalSubscription();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     if (!token) return;
 
-    const connect = async () => {
-      if (isConnecting || isConnected) return;
-
+    const handleConnect = async () => {
       try {
-        setIsConnecting(true);
+        await connect();
+        setIsConnected(true);
         setError(null);
-
-        const response = await fetch("http://localhost:8085/api/v1/ws/info", {
-          headers: {
-            Authorization: token,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to get connection info");
-        }
-
-        const info = await response.json();
-        if (!info.ws_url) {
-          throw new Error("WebSocket URL not provided in server response");
-        }
-
-        const subscriptionResponse = await fetch(
-          `http://localhost:8085/api/v1/ws/token/subscription/personal`,
-          {
-            headers: {
-              Authorization: token,
-              "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify({}),
-          }
-        );
-
-        if (!subscriptionResponse.ok) {
-          throw new Error("Failed to get subscription token");
-        }
-
-        const subscriptionData = await subscriptionResponse.json();
-        if (!subscriptionData.accessToken) {
-          throw new Error("Subscription token not provided in server response");
-        }
-
-        websocketService.connect(info.ws_url, subscriptionData.accessToken);
-      } catch (err) {
+        await subscribeToPersonal();
+      } catch (err: unknown) {
+        console.error("Failed to connect or subscribe:", err);
         setError(
           err instanceof Error
             ? err
-            : new Error("Failed to connect to WebSocket")
+            : new Error("Failed to connect or subscribe")
         );
         setIsConnected(false);
-      } finally {
-        setIsConnecting(false);
       }
     };
 
-    // Set up WebSocket event handlers
-    const handleConnected = () => {
-      setIsConnected(true);
-      setError(null);
-    };
+    handleConnect();
 
-    const handleDisconnected = () => {
-      setIsConnected(false);
-    };
-
-    const handleError = (err: Error) => {
-      setError(err);
-      setIsConnected(false);
-    };
-
-    websocketService.on("connected", handleConnected);
-    websocketService.on("disconnected", handleDisconnected);
-    websocketService.on("error", handleError);
-
-    // Initial connection
-    connect();
-
-    // Cleanup
     return () => {
-      websocketService.off("connected", handleConnected);
-      websocketService.off("disconnected", handleDisconnected);
-      websocketService.off("error", handleError);
-      websocketService.disconnect();
+      // Cleanup will be handled by the WebSocket service
     };
-  }, []);
+  }, []); // Empty dependency array since we only want to run this once
 
   return (
-    <WebSocketContext.Provider value={{ isConnected, isConnecting, error }}>
+    <WebSocketContext.Provider
+      value={{
+        isConnected,
+        isConnecting: isConnecting || isPersonalSubscribing,
+        error,
+      }}
+    >
       {children}
     </WebSocketContext.Provider>
   );
 }
 
 export function useWebSocket() {
-  return useContext(WebSocketContext);
+  const context = useContext(WebSocketContext);
+  if (!context) {
+    throw new Error("useWebSocket must be used within a WebSocketProvider");
+  }
+  return context;
 }

@@ -94,6 +94,13 @@ class WebSocketService {
         if (token === "" || token === null || token === undefined) {
             throw new Error(`Error creating subscription for channel: ${channel} | Error: Token is empty or undefined or null`);
         }
+
+        // Check if subscription already exists
+        if (this.subscriptions.has(channel)) {
+            console.log("Subscription already exists for channel:", channel);
+            return this.subscriptions.get(channel);
+        }
+
         console.log("Creating subscription for channel:", channel, "with token:", token);
         const subscription = this.centrifuge.newSubscription(channel, {
             token,
