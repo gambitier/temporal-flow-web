@@ -379,9 +379,7 @@ export default function TradingPage() {
       const initialWatchlistId = watchlists[0].id;
       setSelectedWatchlist(initialWatchlistId);
       // Subscribe to initial watchlist
-      subscribeToWatchlist(initialWatchlistId).catch((error) => {
-        console.error("Failed to subscribe to initial watchlist:", error);
-      });
+      subscribeToWatchlist(initialWatchlistId);
     }
   }, [watchlists, selectedWatchlist, subscribeToWatchlist]);
 
