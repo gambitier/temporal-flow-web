@@ -30,6 +30,34 @@ export default function DashboardPage() {
     },
   ];
 
+  // Separate activity data from UI
+  const activities = [
+    {
+      iconBg: "bg-purple-500",
+      icon: Activity,
+      content: (
+        <>
+          Workflow <span className="font-medium text-foreground">#1234</span>{" "}
+          completed
+        </>
+      ),
+      time: "3h ago",
+      dateTime: "2024-03-20",
+    },
+    {
+      iconBg: "bg-green-500",
+      icon: Users,
+      content: (
+        <>
+          New team member{" "}
+          <span className="font-medium text-foreground">John Doe</span> joined
+        </>
+      ),
+      time: "1d ago",
+      dateTime: "2024-03-19",
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -76,64 +104,38 @@ export default function DashboardPage() {
           <div className="mt-6">
             <div className="flow-root">
               <ul role="list" className="-mb-8">
-                <li>
-                  <div className="relative pb-8">
-                    <span
-                      className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
-                      aria-hidden="true"
-                    />
-                    <div className="relative flex space-x-3">
-                      <div>
-                        <span className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center ring-8 ring-white">
-                          <Activity className="h-5 w-5 text-white" />
-                        </span>
-                      </div>
-                      <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                {activities.map((activity, idx) => (
+                  <li key={idx}>
+                    <div className="relative pb-8">
+                      {/* Only render the vertical line if not the last item */}
+                      {idx < activities.length - 1 && (
+                        <span
+                          className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700"
+                          aria-hidden="true"
+                        />
+                      )}
+                      <div className="relative flex space-x-3">
                         <div>
-                          <p className="body2">
-                            Workflow{" "}
-                            <span className="font-medium text-foreground">
-                              #1234
-                            </span>{" "}
-                            completed
-                          </p>
+                          <span
+                            className={`h-8 w-8 rounded-full ${activity.iconBg} flex items-center justify-center ring-8 ring-white`}
+                          >
+                            <activity.icon className="h-5 w-5 text-white" />
+                          </span>
                         </div>
-                        <div className="whitespace-nowrap text-right body2">
-                          <time dateTime="2024-03-20">3h ago</time>
+                        <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                          <div>
+                            <p className="body2">{activity.content}</p>
+                          </div>
+                          <div className="whitespace-nowrap text-right body2">
+                            <time dateTime={activity.dateTime}>
+                              {activity.time}
+                            </time>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-                <li>
-                  <div className="relative pb-8">
-                    <span
-                      className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
-                      aria-hidden="true"
-                    />
-                    <div className="relative flex space-x-3">
-                      <div>
-                        <span className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
-                          <Users className="h-5 w-5 text-white" />
-                        </span>
-                      </div>
-                      <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                        <div>
-                          <p className="body2">
-                            New team member{" "}
-                            <span className="font-medium text-foreground">
-                              John Doe
-                            </span>{" "}
-                            joined
-                          </p>
-                        </div>
-                        <div className="whitespace-nowrap text-right body2">
-                          <time dateTime="2024-03-19">1d ago</time>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </li>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
