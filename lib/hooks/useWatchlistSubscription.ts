@@ -1,7 +1,8 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
+import { usePathname } from "next/navigation";
 import websocketService from "@/lib/services/websocket";
 
 interface WatchlistSubscriptionToken {
@@ -11,6 +12,8 @@ interface WatchlistSubscriptionToken {
 export function useWatchlistSubscription() {
     const [currentWatchlistId, setCurrentWatchlistId] = useState<string | null>(null);
     const [isSubscribing, setIsSubscribing] = useState(false);
+    const subscriptionRef = useRef<any>(null);
+    const pathname = usePathname();
 
     const getSubscriptionToken = useMutation({
         mutationFn: async (watchlistId: string) => {
@@ -51,23 +54,40 @@ export function useWatchlistSubscription() {
             return;
         }
 
-        // If we're already subscribing to this watchlist, don't try again
-        if (isSubscribing && currentWatchlistId === watchlistId) {
+        if (isSubscribing) {
+            console.log("Already in process of subscribing");
+            return;
+        }
+        if (currentWatchlistId === watchlistId) {
             console.log("Already subscribing to watchlist:", watchlistId);
+            return;
+        }
+
+        // If we're already subscribed to this watchlist, no need to resubscribe
+        if (currentWatchlistId === watchlistId && subscriptionRef.current) {
+            console.log("Already subscribed to watchlist:", watchlistId);
             return;
         }
 
         try {
             setIsSubscribing(true);
-            console.log("Subscribing to watchlist:", watchlistId);
+
+            const channel = `watchlist:${watchlistId}`;
+            if (websocketService.isExistingSubscription(channel)) {
+                console.log("Subscription already exists for channel:", channel);
+                return;
+            }
+
+            if (subscriptionRef.current) {
+                console.log("Unsubscribing from previous watchlist:", currentWatchlistId);
+                subscriptionRef.current.unsubscribe();
+                subscriptionRef.current = null;
+            }
 
             // Get new subscription token
             const token = await getSubscriptionToken.mutateAsync(watchlistId);
-
-            // Subscribe to new watchlist
-            const channel = `watchlist:${watchlistId}`;
-            console.log("Creating subscription for channel:", channel);
             const subscription = websocketService.createSubscription(channel, token);
+            subscriptionRef.current = subscription;
 
             subscription.on("subscribing", (ctx: any) => {
                 console.log("Subscribing to channel:", channel, ctx);
@@ -110,10 +130,25 @@ export function useWatchlistSubscription() {
         }
     }, [currentWatchlistId, getSubscriptionToken, isSubscribing]);
 
+    // Handle route changes
+    useEffect(() => {
+        const isTradingPage = pathname === '/dashboard/trading';
+
+        if (!isTradingPage && subscriptionRef.current) {
+            console.log("Leaving trading page, unsubscribing from watchlist");
+            subscriptionRef.current.unsubscribe();
+            subscriptionRef.current = null;
+            setCurrentWatchlistId(null);
+        }
+    }, [pathname]);
+
     // Cleanup subscription on unmount
     useEffect(() => {
         return () => {
-            if (currentWatchlistId) {
+            if (subscriptionRef.current && currentWatchlistId) {
+                console.log("Cleaning up subscription for channel:", `watchlist:${currentWatchlistId}`);
+                subscriptionRef.current.unsubscribe();
+                subscriptionRef.current = null;
                 setCurrentWatchlistId(null);
             }
         };

@@ -86,12 +86,24 @@ class WebSocketService {
         }
     }
 
+    public isExistingSubscription(channel: string) {
+        if (!this.centrifuge) {
+            throw new Error("WebSocket not connected");
+        }
+        const existingSubscription = this.centrifuge.getSubscription(channel);
+        return existingSubscription !== null;
+    }
+
     public createSubscription(channel: string, token: string) {
         if (!this.centrifuge) {
             throw new Error("WebSocket not connected");
         }
         if (token === "" || token === null || token === undefined) {
             throw new Error(`Error creating subscription for channel: ${channel} | Error: Token is empty or undefined or null`);
+        }
+
+        if (this.isExistingSubscription(channel)) {
+            throw new Error(`Subscription already exists for channel: ${channel}`);
         }
 
         const subscription = this.centrifuge.newSubscription(channel, {

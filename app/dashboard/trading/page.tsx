@@ -381,7 +381,7 @@ export default function TradingPage() {
       // Subscribe to initial watchlist
       subscribeToWatchlist(initialWatchlistId);
     }
-  }, [watchlists, selectedWatchlist, subscribeToWatchlist]);
+  }, [watchlists]);
 
   // Fetch symbols for selected watchlist
   const { symbols, isLoading: isLoadingSymbols } =
@@ -451,6 +451,11 @@ export default function TradingPage() {
   // Handle watchlist selection
   const handleWatchlistChange = async (watchlistId: string) => {
     if (!watchlistId) return;
+
+    // Don't resubscribe if it's the same watchlist
+    if (watchlistId === selectedWatchlist) {
+      return;
+    }
 
     try {
       setSelectedWatchlist(watchlistId);
