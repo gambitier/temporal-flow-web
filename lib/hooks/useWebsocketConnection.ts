@@ -117,10 +117,26 @@ export function useWebsocketConnection() {
 
     return {
         connect: () => {
-            // Only trigger mutation if not already connecting
-            if (!isConnecting) {
-                connectMutation.mutate();
-            }
+            return new Promise<void>((resolve, reject) => {
+                // Only trigger mutation if not already connecting
+                if (!isConnecting) {
+                    connectMutation.mutate(undefined, {
+                        onSuccess: () => {
+                            // Set up a one-time listener for the connected event
+                            const handleConnected = () => {
+                                websocketService.off("connected", handleConnected);
+                                resolve();
+                            };
+                            websocketService.on("connected", handleConnected);
+                        },
+                        onError: (error) => {
+                            reject(error);
+                        }
+                    });
+                } else {
+                    resolve(); // Resolve immediately if already connecting
+                }
+            });
         },
         isConnecting: connectMutation.isPending || isConnecting,
         error: connectMutation.error,

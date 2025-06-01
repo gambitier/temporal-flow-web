@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useWebsocketConnection } from "@/lib/hooks/useWebsocketConnection";
 import { usePersonalSubscription } from "@/lib/hooks/usePersonalSubscription";
+import websocketService from "@/lib/services/websocket";
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -28,27 +29,42 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     if (!token) {
       return;
     }
+
     const handleConnect = async () => {
       try {
+        // First connect to WebSocket
         await connect();
         setIsConnected(true);
         setError(null);
-        await subscribeToPersonal();
       } catch (err: unknown) {
-        console.error("Failed to connect or subscribe:", err);
-        setError(
-          err instanceof Error
-            ? err
-            : new Error("Failed to connect or subscribe")
-        );
+        console.error("Failed to connect:", err);
+        setError(err instanceof Error ? err : new Error("Failed to connect"));
         setIsConnected(false);
       }
     };
 
+    // Subscribe to personal channel when WebSocket is connected
+    const handleConnected = async () => {
+      try {
+        await subscribeToPersonal();
+      } catch (err: unknown) {
+        console.error("Failed to subscribe to personal channel:", err);
+        setError(
+          err instanceof Error
+            ? err
+            : new Error("Failed to subscribe to personal channel")
+        );
+      }
+    };
+
+    // Set up WebSocket event listeners
+    websocketService.on("connected", handleConnected);
+
     handleConnect();
 
     return () => {
-      // Cleanup will be handled by the WebSocket service
+      // Clean up event listeners
+      websocketService.off("connected", handleConnected);
     };
   }, []); // Empty dependency array since we only want to run this once
 
@@ -65,10 +81,4 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useWebSocket() {
-  const context = useContext(WebSocketContext);
-  if (!context) {
-    throw new Error("useWebSocket must be used within a WebSocketProvider");
-  }
-  return context;
-}
+export const useWebSocket = () => useContext(WebSocketContext);
