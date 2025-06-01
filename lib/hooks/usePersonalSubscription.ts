@@ -64,7 +64,11 @@ export function usePersonalSubscription() {
 
             // Subscribe to personal channel
             const channel = `personal:${userId}`;
-            console.log("Creating subscription for personal channel:", channel);
+            if (websocketService.isExistingSubscription(channel)) {
+                console.log("Subscription already exists for channel:", channel);
+                return;
+            }
+
             const subscription = websocketService.createSubscription(channel, token);
 
             subscription.on("subscribing", (ctx: any) => {
