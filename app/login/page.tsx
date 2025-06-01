@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { TrendingUp } from "lucide-react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import PublicRoute from "@/components/auth/PublicRoute";
 
-export default function LoginPage() {
+function LoginContent() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -36,140 +36,154 @@ export default function LoginPage() {
   };
 
   return (
-    <PublicRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        {/* Header */}
-        <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">
-                Temporal Flow
-              </span>
-            </Link>
-          </div>
-        </header>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900">
+              Temporal Flow
+            </span>
+          </Link>
+        </div>
+      </header>
 
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-md mx-auto">
-            <Card className="border-0 shadow-lg bg-card text-card-foreground">
-              <CardHeader className="space-y-1">
-                <div className="flex items-center justify-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-                    <TrendingUp className="w-6 h-6 text-white" />
-                  </div>
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-md mx-auto">
+          <Card className="border-0 shadow-lg bg-card text-card-foreground">
+            <CardHeader className="space-y-1">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="heading2 text-center">
-                  Welcome back
-                </CardTitle>
-                <CardDescription className="subtitle1 text-center">
-                  Sign in to your account
-                </CardDescription>
-              </CardHeader>
+              </div>
+              <CardTitle className="heading2 text-center">
+                Welcome back
+              </CardTitle>
+              <CardDescription className="subtitle1 text-center">
+                Sign in to your account
+              </CardDescription>
+            </CardHeader>
 
-              <div className="p-6">
-                {searchParams.get("registered") && (
-                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-                    <p className="text-sm text-green-600">
-                      Registration successful! Please sign in.
+            <div className="p-6">
+              {searchParams.get("registered") && (
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                  <p className="text-sm text-green-600">
+                    Registration successful! Please sign in.
+                  </p>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="email" className="body2 font-medium">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
+                    placeholder="john@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="password" className="body2 font-medium">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                    <p className="text-sm text-red-600">
+                      {error instanceof Error
+                        ? error.message
+                        : "An error occurred"}
                     </p>
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="body2 font-medium">
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
-                      placeholder="john@example.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="password" className="body2 font-medium">
-                      Password
-                    </label>
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
-                      placeholder="Enter your password"
-                      value={formData.password}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  {error && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                      <p className="text-sm text-red-600">
-                        {error instanceof Error
-                          ? error.message
-                          : "An error occurred"}
-                      </p>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Signing in...
                     </div>
+                  ) : (
+                    "Sign in"
                   )}
+                </Button>
 
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                <p className="text-center body2">
+                  Don't have an account?{" "}
+                  <Link
+                    href="/register"
+                    className="font-medium text-purple-600 hover:text-purple-500"
                   >
-                    {isLoading ? (
-                      <div className="flex items-center justify-center">
-                        <svg
-                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Signing in...
-                      </div>
-                    ) : (
-                      "Sign in"
-                    )}
-                  </Button>
-
-                  <p className="text-center body2">
-                    Don't have an account?{" "}
-                    <Link
-                      href="/register"
-                      className="font-medium text-purple-600 hover:text-purple-500"
-                    >
-                      Sign up
-                    </Link>
-                  </p>
-                </form>
-              </div>
-            </Card>
-          </div>
+                    Sign up
+                  </Link>
+                </p>
+              </form>
+            </div>
+          </Card>
         </div>
       </div>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <PublicRoute>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          </div>
+        }
+      >
+        <LoginContent />
+      </Suspense>
     </PublicRoute>
   );
 }
