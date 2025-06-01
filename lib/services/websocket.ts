@@ -1,4 +1,4 @@
-import { Centrifuge } from 'centrifuge';
+import { Centrifuge, Subscription } from 'centrifuge';
 
 type EventCallback = (ctx: any) => void;
 
@@ -86,15 +86,14 @@ class WebSocketService {
         }
     }
 
-    public isExistingSubscription(channel: string) {
+    public isExistingSubscription(channel: string): boolean {
         if (!this.centrifuge) {
             throw new Error("WebSocket not connected");
         }
-        const existingSubscription = this.centrifuge.getSubscription(channel);
-        return existingSubscription !== null;
+        return this.centrifuge.getSubscription(channel) !== null;
     }
 
-    public createSubscription(channel: string, token: string) {
+    public createSubscription(channel: string, token: string): Subscription {
         if (!this.centrifuge) {
             throw new Error("WebSocket not connected");
         }
