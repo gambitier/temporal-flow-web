@@ -1,9 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import config from "@/lib/config";
 import websocketService from "@/lib/services/websocket";
-import { useWebsocketConnection } from './useWebsocketConnection';
 
 interface LoginCredentials {
     email: string;
@@ -91,7 +89,6 @@ const fetchUserData = async (token: string): Promise<User> => {
 export function useAuth() {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
-    const { connect: connectWebSocket } = useWebsocketConnection();
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -104,9 +101,6 @@ export function useAuth() {
                     localStorage.removeItem("token");
                     router.push("/login");
                 });
-
-            // Only attempt WebSocket connection if we have a token
-            connectWebSocket();
         }
     }, []);
 
@@ -119,7 +113,6 @@ export function useAuth() {
             localStorage.setItem("token", token);
             const userData = await fetchUserData(token);
             setUser(userData);
-            connectWebSocket();
             router.push("/dashboard");
         },
         onError: (error) => {
