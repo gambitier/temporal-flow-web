@@ -1,6 +1,7 @@
 "use client"
 
 import { useMutation } from "@tanstack/react-query";
+import websocketService from "../services/websocket";
 
 interface WebSocketInfo {
     ws_url: string;
@@ -26,6 +27,11 @@ async function getWebSocketInfo(token: string): Promise<WebSocketInfo> {
     return data;
 }
 
+interface ConnectionData {
+    wsUrl: string;
+    accessToken: string;
+}
+
 
 export function useWebsocketConnection() {
     const connectMutation = useMutation({
@@ -38,10 +44,12 @@ export function useWebsocketConnection() {
             try {
                 const info = await getWebSocketInfo(accessToken);
 
-                return {
+                const data: ConnectionData = {
                     wsUrl: info.ws_url,
                     accessToken: accessToken
                 };
+
+                return data;
             } catch (error) {
                 console.error("WebSocket connection failed:", error);
             }
@@ -54,9 +62,14 @@ export function useWebsocketConnection() {
                 // Only trigger mutation if not already connecting
                 if (!connectMutation.isPending) {
                     connectMutation.mutate(undefined, {
-                        onSuccess: () => {
-                            console.log("WebSocket connection successful");
-                            resolve();
+                        onSuccess: (data: ConnectionData | undefined) => {
+                            if (!data) {
+                                reject(new Error("No connection data received"));
+                            } else {
+                                websocketService.connect(data.wsUrl, data.accessToken);
+                                console.log("WebSocket connection successful");
+                                resolve();
+                            }
                         },
                         onError: (error) => {
                             console.error("WebSocket connection failed:", error);

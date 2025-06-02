@@ -55,7 +55,10 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     };
 
     // Set up WebSocket event listeners
-    websocketService.on("connected", handleConnected);
+    websocketService.on("connected", (ctx) => {
+      console.log("received event: WebSocket connected:", ctx);
+      handleConnected();
+    });
 
     connectToWebsocket();
   }, []);
