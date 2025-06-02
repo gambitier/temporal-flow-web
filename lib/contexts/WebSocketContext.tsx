@@ -1,23 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import { useWebsocketConnection } from "@/lib/hooks/useWebsocketConnection";
 import { usePersonalSubscription } from "@/lib/hooks/usePersonalSubscription";
 import websocketService from "@/lib/services/websocket";
 
-interface WebSocketContextType {
-  isConnected: boolean;
-  error: Error | null;
-}
-
-const WebSocketContext = createContext<WebSocketContextType>({
-  isConnected: false,
-  error: null,
-});
+const WebSocketContext = createContext({});
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
-  const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
   const { connect } = useWebsocketConnection();
   const { subscribeToPersonal } = usePersonalSubscription();
 
@@ -31,12 +21,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       try {
         // First connect to WebSocket
         await connect();
-        setIsConnected(true);
-        setError(null);
       } catch (err: unknown) {
         console.error("Failed to connect:", err);
-        setError(err instanceof Error ? err : new Error("Failed to connect"));
-        setIsConnected(false);
       }
     };
 
@@ -46,11 +32,6 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         await subscribeToPersonal();
       } catch (err: unknown) {
         console.error("Failed to subscribe to personal channel:", err);
-        setError(
-          err instanceof Error
-            ? err
-            : new Error("Failed to subscribe to personal channel")
-        );
       }
     };
 
@@ -64,14 +45,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <WebSocketContext.Provider
-      value={{
-        isConnected,
-        error,
-      }}
-    >
-      {children}
-    </WebSocketContext.Provider>
+    <WebSocketContext.Provider value={{}}>{children}</WebSocketContext.Provider>
   );
 }
 
