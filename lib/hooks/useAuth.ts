@@ -86,6 +86,21 @@ const fetchUserData = async (token: string): Promise<User> => {
     return data;
 };
 
+const logoutUser = async (token: string): Promise<void> => {
+    const response = await fetch("http://localhost:8085/api/v1/auth/logout", {
+        method: "POST",
+        headers: {
+            "Authorization": token,
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Logout failed");
+    }
+};
+
 export function useAuth() {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
@@ -127,12 +142,29 @@ export function useAuth() {
         },
     });
 
+    const logoutMutation = useMutation({
+        mutationFn: () => {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                throw new Error("No token found");
+            }
+            return logoutUser(token);
+        },
+        onSuccess: () => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("tokenType");
+            setUser(null);
+            websocketService.disconnect();
+            router.push("/login");
+        },
+        onError: (error) => {
+            console.error("Logout failed:", error);
+        }
+    });
+
     const logout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("accessToken");
-        setUser(null);
-        websocketService.disconnect();
-        router.push("/login");
+        logoutMutation.mutate();
     };
 
     return {
@@ -140,7 +172,7 @@ export function useAuth() {
         login: loginMutation.mutate,
         register: registerMutation.mutate,
         logout,
-        isLoading: loginMutation.isPending || registerMutation.isPending,
-        error: loginMutation.error || registerMutation.error,
+        isLoading: loginMutation.isPending || registerMutation.isPending || logoutMutation.isPending,
+        error: loginMutation.error || registerMutation.error || logoutMutation.error,
     };
 } 
