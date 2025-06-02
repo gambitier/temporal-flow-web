@@ -48,27 +48,21 @@ export function usePersonalSubscription() {
 
     const subscribeToPersonal = useCallback(async () => {
         try {
-            console.log("Subscribing to personal channel");
-
-            // Get new subscription token
-            const token = await getSubscriptionToken.mutateAsync();
-
-            // Get user ID from token
             const accessToken = localStorage.getItem("accessToken");
             if (!accessToken) {
                 throw new Error("No authentication token found");
             }
             const decoded = jwtDecode<JwtPayload>(accessToken);
             const userId = decoded.sub;
-            console.log("Got user ID from token:", userId);
 
-            // Subscribe to personal channel
             const channel = `personal:${userId}`;
             if (websocketService.isExistingSubscription(channel)) {
                 console.log("Subscription already exists for channel:", channel);
                 return;
             }
 
+            // Get new subscription token
+            const token = await getSubscriptionToken.mutateAsync();
             const subscription = websocketService.createSubscription(channel, token);
 
             subscription.on("subscribing", (ctx: any) => {
