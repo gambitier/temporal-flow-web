@@ -14,7 +14,6 @@ import { ColumnDef, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import websocketService from "@/lib/services/websocket";
-import { useWebSocket } from "@/lib/contexts/WebSocketContext";
 import { useWatchlistSubscription } from "@/lib/hooks/useWatchlistSubscription";
 
 type FilterType = "all" | "gainers" | "losers";
@@ -335,7 +334,6 @@ export default function TradingPage() {
   const [stockData, setStockData] = useState<StockQuote[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [mounted, setMounted] = useState(false);
-  const { isConnected } = useWebSocket();
   const { subscribeToWatchlist, isSubscribing } = useWatchlistSubscription();
 
   // Handle initial sorting state after mount
@@ -389,7 +387,7 @@ export default function TradingPage() {
 
   // Handle WebSocket updates
   useEffect(() => {
-    if (!mounted || !isConnected) return;
+    if (!mounted) return;
 
     const handleStockUpdate = (data: any) => {
       setStockData((prevData) => {
@@ -444,7 +442,7 @@ export default function TradingPage() {
       // Cleanup subscription
       websocketService.off("publication", handlePublication);
     };
-  }, [mounted, isConnected]);
+  }, [mounted]);
 
   // Handle watchlist selection
   const handleWatchlistChange = async (watchlistId: string) => {
