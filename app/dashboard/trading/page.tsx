@@ -446,8 +446,6 @@ export default function TradingPage() {
     };
   }, [mounted, isConnected]);
 
-  const isLoading = isLoadingWatchlists || isLoadingSymbols;
-
   // Handle watchlist selection
   const handleWatchlistChange = async (watchlistId: string) => {
     if (!watchlistId) return;
