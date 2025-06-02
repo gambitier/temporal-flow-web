@@ -7,13 +7,8 @@ interface WebSocketInfo {
     ws_url: string;
 }
 
-interface SubscriptionTokenResponse {
-    accessToken: string;
-}
-
 interface ConnectionData {
     wsUrl: string;
-    subscriptionToken: string;
     accessToken: string;
 }
 
@@ -32,34 +27,6 @@ async function getWebSocketInfo(token: string): Promise<WebSocketInfo> {
     const data = await response.json();
     if (!data.ws_url) {
         throw new Error("WebSocket URL not provided in server response");
-    }
-
-    return data;
-}
-
-async function getSubscriptionToken(token: string): Promise<SubscriptionTokenResponse> {
-    const personalChannel = "personal";
-
-    const response = await fetch(
-        `http://localhost:8085/api/v1/ws/token/subscription/${personalChannel}`,
-        {
-            headers: {
-                "Authorization": token,
-                "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify({}),
-        }
-    );
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || "Failed to get subscription token");
-    }
-
-    const data = await response.json();
-    if (!data.accessToken) {
-        throw new Error("Subscription token not provided in server response");
     }
 
     return data;
@@ -85,14 +52,10 @@ export function useWebsocketConnection() {
             isConnecting = true;
             connectionPromise = (async () => {
                 try {
-                    const [info, subscriptionTokenData] = await Promise.all([
-                        getWebSocketInfo(accessToken),
-                        getSubscriptionToken(accessToken)
-                    ]);
+                    const info = await getWebSocketInfo(accessToken);
 
                     return {
                         wsUrl: info.ws_url,
-                        subscriptionToken: subscriptionTokenData.accessToken,
                         accessToken: accessToken
                     };
                 } finally {

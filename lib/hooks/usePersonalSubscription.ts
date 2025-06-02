@@ -17,7 +17,7 @@ export function usePersonalSubscription() {
     const getSubscriptionToken = useMutation({
         mutationFn: async () => {
             const personalChannel = "personal";
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("accessToken");
             if (!token) {
                 throw new Error("No authentication token found");
             }
