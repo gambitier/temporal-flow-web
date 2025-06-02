@@ -91,7 +91,7 @@ const fetchUserData = async (token: string): Promise<User> => {
 export function useAuth() {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
-    const { connect: connectWebSocket, isError: isWebSocketError } = useWebsocketConnection();
+    const { connect: connectWebSocket } = useWebsocketConnection();
 
     useEffect(() => {
         const token = localStorage.getItem("token");

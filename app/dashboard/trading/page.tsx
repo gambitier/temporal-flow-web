@@ -335,7 +335,7 @@ export default function TradingPage() {
   const [stockData, setStockData] = useState<StockQuote[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [mounted, setMounted] = useState(false);
-  const { isConnected, isConnecting, error } = useWebSocket();
+  const { isConnected } = useWebSocket();
   const { subscribeToWatchlist, isSubscribing } = useWatchlistSubscription();
 
   // Handle initial sorting state after mount

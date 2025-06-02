@@ -7,13 +7,11 @@ import websocketService from "@/lib/services/websocket";
 
 interface WebSocketContextType {
   isConnected: boolean;
-  isConnecting: boolean;
   error: Error | null;
 }
 
 const WebSocketContext = createContext<WebSocketContextType>({
   isConnected: false,
-  isConnecting: false,
   error: null,
 });
 
@@ -30,7 +28,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const handleConnect = async () => {
+    const connectToWebsocket = async () => {
       try {
         // First connect to WebSocket
         await connect();
@@ -60,19 +58,13 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     // Set up WebSocket event listeners
     websocketService.on("connected", handleConnected);
 
-    handleConnect();
-
-    return () => {
-      // Clean up event listeners
-      websocketService.off("connected", handleConnected);
-    };
-  }, []); // Empty dependency array since we only want to run this once
+    connectToWebsocket();
+  }, []);
 
   return (
     <WebSocketContext.Provider
       value={{
         isConnected,
-        isConnecting: isConnecting || isPersonalSubscribing,
         error,
       }}
     >
