@@ -36,12 +36,19 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     };
 
     // Set up WebSocket event listeners
-    websocketService.on("connected", (ctx) => {
+    const onConnected = (ctx: any) => {
       console.log("received event: WebSocket connected:", ctx);
       handleConnected();
-    });
+    };
+
+    websocketService.on("connected", onConnected);
 
     connectToWebsocket();
+
+    return () => {
+      // Cleanup function to remove event listener, so that handleConnected is not called multiple times
+      websocketService.off("connected", onConnected);
+    };
   }, []);
 
   return (
