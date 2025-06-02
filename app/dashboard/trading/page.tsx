@@ -331,10 +331,10 @@ export default function TradingPage() {
   const { user } = useAuth();
   const [selectedWatchlist, setSelectedWatchlist] = useState<string>("");
   const [filter, setFilter] = useState<FilterType>("all");
-  const [stockData, setStockData] = useState<StockQuote[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [mounted, setMounted] = useState(false);
-  const { subscribeToWatchlist, isSubscribing } = useWatchlistSubscription();
+  const { subscribeToWatchlist, isSubscribing, stockData } =
+    useWatchlistSubscription();
 
   // Handle initial sorting state after mount
   useEffect(() => {
@@ -384,65 +384,6 @@ export default function TradingPage() {
   // Fetch symbols for selected watchlist
   const { symbols, isLoading: isLoadingSymbols } =
     useWatchlistSymbols(selectedWatchlist);
-
-  // Handle WebSocket updates
-  useEffect(() => {
-    if (!mounted) return;
-
-    const handleStockUpdate = (data: any) => {
-      setStockData((prevData) => {
-        const newData = [...prevData];
-        Object.entries(data).forEach(([symbol, quote]: [string, any]) => {
-          const existingIndex = newData.findIndex(
-            (item) => item.symbol === symbol
-          );
-
-          const LastTradedPrice = quote.LastTradedPrice / 100;
-          const ClosePrice = quote.ClosePrice / 100;
-          const OpenPrice = quote.OpenPrice / 100;
-          const HighPrice = quote.HighPrice / 100;
-          const LowPrice = quote.LowPrice / 100;
-          const VolumeTradedToday = quote.VolumeTradedToday;
-          const stockQuote: StockQuote = {
-            symbol,
-            name: symbol,
-            lastPrice: LastTradedPrice,
-            change: LastTradedPrice - ClosePrice,
-            changePercent: ((LastTradedPrice - ClosePrice) / ClosePrice) * 100,
-            openPrice: OpenPrice,
-            highPrice: HighPrice,
-            lowPrice: LowPrice,
-            closePrice: ClosePrice,
-            volume: VolumeTradedToday,
-            timestamp: new Date(
-              quote.ExchangeFeedTimeEpochMillis
-            ).toISOString(),
-          };
-
-          if (existingIndex >= 0) {
-            newData[existingIndex] = stockQuote;
-          } else {
-            newData.push(stockQuote);
-          }
-        });
-        return newData;
-      });
-    };
-
-    // Subscribe to WebSocket updates
-    const handlePublication = (ctx: WebSocketContext) => {
-      if (ctx.channel.includes("watchlist")) {
-        handleStockUpdate(ctx.data.data);
-      }
-    };
-
-    websocketService.on("publication", handlePublication);
-
-    return () => {
-      // Cleanup subscription
-      websocketService.off("publication", handlePublication);
-    };
-  }, [mounted]);
 
   // Handle watchlist selection
   const handleWatchlistChange = async (watchlistId: string) => {
