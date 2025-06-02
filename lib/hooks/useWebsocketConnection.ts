@@ -68,8 +68,6 @@ export function useWebsocketConnection() {
                 }
             });
         },
-        isConnecting: connectMutation.isPending,
         error: connectMutation.error,
-        isError: connectMutation.isError
     };
 }

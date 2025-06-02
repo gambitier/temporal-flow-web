@@ -18,9 +18,8 @@ const WebSocketContext = createContext<WebSocketContextType>({
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const { connect, isConnecting } = useWebsocketConnection();
-  const { subscribeToPersonal, isSubscribing: isPersonalSubscribing } =
-    usePersonalSubscription();
+  const { connect } = useWebsocketConnection();
+  const { subscribeToPersonal } = usePersonalSubscription();
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
