@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
-import { TradingFormData, OHLCData } from "../types";
+import { TradingFormData, OHLCData } from "@/app/types/trading";
 import { TradingStrategy } from "./TradingStrategy";
 import { OHLCDataDisplay } from "./OHLCDataDisplay";
 import { TradingOptions } from "./TradingOptions";

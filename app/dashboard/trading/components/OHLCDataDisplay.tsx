@@ -1,5 +1,5 @@
 import { Label } from "@/components/ui/label";
-import { OHLCData } from "../types";
+import { OHLCData } from "@/app/types/trading";
 
 interface OHLCDataDisplayProps {
   data?: OHLCData;

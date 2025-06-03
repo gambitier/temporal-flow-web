@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CANDLE_DURATIONS, TRADING_STRATEGIES } from "../types";
+import { CANDLE_DURATIONS, TRADING_STRATEGIES } from "@/app/types/trading";
 
 interface TradingStrategyProps {
   strategy: string;

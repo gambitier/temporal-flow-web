@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ENTRY_THRESHOLDS, EXIT_THRESHOLDS } from "../types";
+import { ENTRY_THRESHOLDS, EXIT_THRESHOLDS } from "@/app/types/trading";
 
 interface TradingOptionsProps {
   entryThreshold: string;
