@@ -83,7 +83,7 @@ export function TradingDialog({
           <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             Trade {symbol}
           </DialogTitle>
-          <DialogDescription>Trading dialog for {symbol}</DialogDescription>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Trade Strategy Section */}
