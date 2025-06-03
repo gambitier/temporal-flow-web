@@ -15,6 +15,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import websocketService from "@/lib/services/websocket";
 import { useWatchlistSubscription } from "@/lib/hooks/useWatchlistSubscription";
+import { TradingDialog } from "./components/TradingDialog";
 
 type FilterType = "all" | "gainers" | "losers";
 
@@ -93,10 +94,18 @@ const columns: ColumnDef<StockQuote>[] = [
   {
     id: "action",
     header: "Action",
-    cell: () => (
-      <Button variant="ghost" size="sm">
-        Trade
-      </Button>
+    cell: ({ row }) => (
+      <TradingDialog
+        symbol={row.original.symbol}
+        currentPrice={row.original.lastPrice}
+        ohlcData={{
+          open: row.original.openPrice,
+          high: row.original.highPrice,
+          low: row.original.lowPrice,
+          close: row.original.closePrice,
+          timestamp: row.original.timestamp,
+        }}
+      />
     ),
   },
   {
