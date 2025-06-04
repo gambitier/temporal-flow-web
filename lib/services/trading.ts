@@ -31,10 +31,16 @@ export interface ExecuteTradeResponse {
 const API_BASE_URL = "http://localhost:8085/api/v1";
 
 export const executeTrade = async (data: ExecuteTradeRequest): Promise<ExecuteTradeResponse> => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+        throw new Error("Authentication token not found");
+    }
+
     const response = await fetch(`${API_BASE_URL}/trading/execute`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
         },
         body: JSON.stringify(data),
     });
