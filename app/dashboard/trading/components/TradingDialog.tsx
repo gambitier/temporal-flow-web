@@ -21,9 +21,9 @@ import {
   TradingFormData,
   OHLCData,
   TRADING_STRATEGIES,
-  CANDLE_DURATIONS,
   ENTRY_THRESHOLDS,
   EXIT_THRESHOLDS,
+  CANDLE_DURATIONS,
 } from "@/app/types/trading";
 import { TradingStrategy } from "./TradingStrategy";
 import { OHLCDataDisplay } from "./OHLCDataDisplay";

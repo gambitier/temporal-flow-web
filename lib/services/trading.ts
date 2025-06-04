@@ -4,6 +4,7 @@ export type TradeType = "LONG" | "SHORT";
 export type StrategyType = "BREAKOUT" | "PREVIOUS_CANDLE" | "CONTINUOUS_CYCLE";
 export type FormStrategyType = "threshold" | "previous_candle" | "continuous_cycle";
 export type FormTradeType = "long" | "short";
+export type CandleDuration = 5 | 15 | 30 | 60 | 120 | 1440;
 
 export interface ExecuteTradeRequest {
     symbol: string;
@@ -12,6 +13,7 @@ export interface ExecuteTradeRequest {
     entryThreshold: number;
     exitThreshold: number;
     quantity: number;
+    candleDuration: CandleDuration;
     prevCandle?: {
         open: number;
         high: number;
@@ -57,10 +59,11 @@ export const mapFormDataToRequest = (formData: TradingFormData, ohlcData?: OHLCD
     const request: ExecuteTradeRequest = {
         symbol: formData.symbol,
         tradeType: formData.tradeType.toUpperCase() as TradeType,
-        strategyType: mapStrategyType(formData.strategy as FormStrategyType),
+        strategyType: mapStrategyType(formData.strategy),
         entryThreshold: parseFloat(formData.entryThreshold),
         exitThreshold: parseFloat(formData.exitThreshold),
         quantity: formData.quantity,
+        candleDuration: formData.candleDuration,
         comparePrevCandle: formData.comparePrevCandle,
     };
 

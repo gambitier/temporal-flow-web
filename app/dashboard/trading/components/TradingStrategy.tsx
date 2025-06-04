@@ -1,4 +1,4 @@
-import { FormStrategyType } from "@/lib/services/trading";
+import { FormStrategyType, CandleDuration } from "@/lib/services/trading";
 import { TRADING_STRATEGIES, CANDLE_DURATIONS } from "@/app/types/trading";
 import {
   Select,
@@ -12,11 +12,11 @@ import { Label } from "@/components/ui/label";
 
 interface TradingStrategyProps {
   strategy: FormStrategyType;
-  candleDuration: string;
+  candleDuration: CandleDuration;
   quantity: number;
   fundsOnRisk: number;
   onStrategyChange: (value: FormStrategyType) => void;
-  onCandleDurationChange: (value: string) => void;
+  onCandleDurationChange: (value: CandleDuration) => void;
   onQuantityChange: (value: number) => void;
 }
 
@@ -57,13 +57,21 @@ export function TradingStrategy({
         <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Candle Duration:
         </Label>
-        <Select value={candleDuration} onValueChange={onCandleDurationChange}>
+        <Select
+          value={candleDuration.toString()}
+          onValueChange={(value) =>
+            onCandleDurationChange(Number(value) as CandleDuration)
+          }
+        >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select duration" />
           </SelectTrigger>
           <SelectContent>
             {CANDLE_DURATIONS.map((duration) => (
-              <SelectItem key={duration.value} value={duration.value}>
+              <SelectItem
+                key={duration.value}
+                value={duration.value.toString()}
+              >
                 {duration.label}
               </SelectItem>
             ))}

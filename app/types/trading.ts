@@ -1,4 +1,4 @@
-import { FormStrategyType, FormTradeType } from "@/lib/services/trading";
+import { FormStrategyType, FormTradeType, CandleDuration } from "@/lib/services/trading";
 
 export interface OHLCData {
     open: number;
@@ -11,7 +11,7 @@ export interface OHLCData {
 export interface TradingFormData {
     symbol: string;
     strategy: FormStrategyType;
-    candleDuration: string;
+    candleDuration: CandleDuration;
     quantity: number;
     fundsOnRisk: number;
     entryThreshold: string;
@@ -20,15 +20,18 @@ export interface TradingFormData {
     comparePrevCandle: boolean;
 }
 
-export const CANDLE_DURATIONS = [
-    { value: "5", label: "5 min" },
-    { value: "15", label: "15 min" },
-    { value: "30", label: "30 min" },
-    { value: "45", label: "45 min" },
-    { value: "60", label: "60 min" },
-    { value: "120", label: "120 min" },
-    { value: "1440", label: "1 day" },
-] as const;
+export const CANDLE_DURATIONS: { value: CandleDuration; label: string }[] = [
+    { value: 5, label: "5 min" },
+    { value: 15, label: "15 min" },
+    { value: 30, label: "30 min" },
+    { value: 60, label: "60 min" },
+    { value: 120, label: "120 min" },
+    { value: 1440, label: "1 day" },
+];
+
+export const isValidCandleDuration = (duration: number): duration is CandleDuration => {
+    return CANDLE_DURATIONS.some(cd => cd.value === duration);
+};
 
 export const TRADING_STRATEGIES = [
     { value: "threshold", label: "Threshold-based" },
