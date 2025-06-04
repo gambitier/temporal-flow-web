@@ -15,7 +15,11 @@ import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import websocketService from "@/lib/services/websocket";
 import { useWatchlistSubscription } from "@/lib/hooks/useWatchlistSubscription";
-import { TradingDialog } from "./components/TradingDialog";
+import {
+  TradingDialog,
+  DialogProvider,
+  GlobalDialog,
+} from "./components/TradingDialog";
 
 type FilterType = "all" | "gainers" | "losers";
 
@@ -400,6 +404,18 @@ export default function TradingPage() {
     }
   }, [sorting, mounted]);
 
+  // Memoize sorting change handler
+  const handleSortingChange = useCallback(
+    (updater: SortingState | ((old: SortingState) => SortingState)) => {
+      if (typeof updater === "function") {
+        setSorting(updater);
+      } else {
+        setSorting(updater);
+      }
+    },
+    []
+  );
+
   // Fetch watchlists
   const { watchlists, isLoading: isLoadingWatchlists } = useWatchlists();
 
@@ -430,84 +446,87 @@ export default function TradingPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Responsive header controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-        <h1 className="heading1 flex-shrink-0">Trading</h1>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
-          <div className="mb-4">
-            <label
-              htmlFor="watchlist"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Select Watchlist
-            </label>
-            <select
-              id="watchlist"
-              value={selectedWatchlist}
-              onChange={(e) => handleWatchlistChange(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300"
-              disabled={isSubscribing}
-            >
-              <option value="">Select a watchlist</option>
-              {watchlists.map((watchlist) => (
-                <option key={watchlist.id} value={watchlist.id}>
-                  {watchlist.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-row flex-wrap gap-2 w-full sm:w-auto">
-            <button
-              onClick={() => setFilter("all")}
-              className={`body2 px-3 py-1 rounded-md font-medium w-full sm:w-auto ${
-                filter === "all"
-                  ? "bg-purple-100 text-purple-700"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setFilter("gainers")}
-              className={`body2 px-3 py-1 rounded-md font-medium flex items-center w-full sm:w-auto ${
-                filter === "gainers"
-                  ? "bg-green-100 text-green-700"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <TrendingUp className="w-4 h-4 mr-1" />
-              Gainers
-            </button>
-            <button
-              onClick={() => setFilter("losers")}
-              className={`body2 px-3 py-1 rounded-md font-medium flex items-center w-full sm:w-auto ${
-                filter === "losers"
-                  ? "bg-red-100 text-red-700"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <TrendingDown className="w-4 h-4 mr-1" />
-              Losers
-            </button>
+    <DialogProvider>
+      <div className="space-y-6">
+        {/* Responsive header controls */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+          <h1 className="heading1 flex-shrink-0">Trading</h1>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+            <div className="mb-4">
+              <label
+                htmlFor="watchlist"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Select Watchlist
+              </label>
+              <select
+                id="watchlist"
+                value={selectedWatchlist}
+                onChange={(e) => handleWatchlistChange(e.target.value)}
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300"
+                disabled={isSubscribing}
+              >
+                <option value="">Select a watchlist</option>
+                {watchlists.map((watchlist) => (
+                  <option key={watchlist.id} value={watchlist.id}>
+                    {watchlist.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-row flex-wrap gap-2 w-full sm:w-auto">
+              <button
+                onClick={() => setFilter("all")}
+                className={`body2 px-3 py-1 rounded-md font-medium w-full sm:w-auto ${
+                  filter === "all"
+                    ? "bg-purple-100 text-purple-700"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilter("gainers")}
+                className={`body2 px-3 py-1 rounded-md font-medium flex items-center w-full sm:w-auto ${
+                  filter === "gainers"
+                    ? "bg-green-100 text-green-700"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <TrendingUp className="w-4 h-4 mr-1" />
+                Gainers
+              </button>
+              <button
+                onClick={() => setFilter("losers")}
+                className={`body2 px-3 py-1 rounded-md font-medium flex items-center w-full sm:w-auto ${
+                  filter === "losers"
+                    ? "bg-red-100 text-red-700"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <TrendingDown className="w-4 h-4 mr-1" />
+                Losers
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {isLoadingSymbols ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-        </div>
-      ) : (
-        <DataTable
-          columns={columns}
-          data={filteredStocks}
-          searchKey="symbol"
-          tableId="trading-table"
-          sorting={sorting}
-          onSortingChange={setSorting}
-        />
-      )}
-    </div>
+        {isLoadingSymbols ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          </div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={filteredStocks}
+            searchKey="symbol"
+            tableId="trading-table"
+            sorting={sorting}
+            onSortingChange={handleSortingChange}
+          />
+        )}
+      </div>
+      <GlobalDialog />
+    </DialogProvider>
   );
 }
