@@ -44,10 +44,10 @@ const TradingDialog = memo(function TradingDialog({
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      executeTrade(formData);
+      executeTrade(formData, ohlcData);
       setIsOpen(false);
     },
-    [formData, executeTrade]
+    [formData, executeTrade, ohlcData]
   );
 
   const updateFormData = useCallback((updates: Partial<TradingFormData>) => {

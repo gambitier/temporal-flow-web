@@ -1,4 +1,4 @@
-import { TradingFormData } from "@/app/types/trading";
+import { TradingFormData, OHLCData } from "@/app/types/trading";
 
 export type TradeType = "LONG" | "SHORT";
 export type StrategyType = "BREAKOUT" | "PREVIOUS_CANDLE" | "CONTINUOUS_CYCLE";
@@ -47,8 +47,8 @@ export const executeTrade = async (data: ExecuteTradeRequest): Promise<ExecuteTr
     return response.json();
 };
 
-export const mapFormDataToRequest = (formData: TradingFormData): ExecuteTradeRequest => {
-    return {
+export const mapFormDataToRequest = (formData: TradingFormData, ohlcData?: OHLCData): ExecuteTradeRequest => {
+    const request: ExecuteTradeRequest = {
         symbol: formData.symbol,
         tradeType: formData.tradeType.toUpperCase() as TradeType,
         strategyType: mapStrategyType(formData.strategy as FormStrategyType),
@@ -57,6 +57,12 @@ export const mapFormDataToRequest = (formData: TradingFormData): ExecuteTradeReq
         quantity: formData.quantity,
         comparePrevCandle: formData.comparePrevCandle,
     };
+
+    if (formData.comparePrevCandle && ohlcData) {
+        request.prevCandle = ohlcData;
+    }
+
+    return request;
 };
 
 const mapStrategyType = (strategy: FormStrategyType): StrategyType => {
