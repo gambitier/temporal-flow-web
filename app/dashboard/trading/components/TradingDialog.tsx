@@ -13,6 +13,7 @@ import { TradingFormData, OHLCData } from "@/app/types/trading";
 import { TradingStrategy } from "./TradingStrategy";
 import { OHLCDataDisplay } from "./OHLCDataDisplay";
 import { TradingOptions } from "./TradingOptions";
+import { useTrading } from "@/lib/hooks/useTrading";
 
 interface TradingDialogProps {
   symbol: string;
@@ -38,14 +39,15 @@ const TradingDialog = memo(function TradingDialog({
     comparePrevCandle: true,
   });
 
+  const { executeTrade, isLoading } = useTrading();
+
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      // TODO: Implement trading logic
-      console.log("Trading form submitted:", formData);
+      executeTrade(formData);
       setIsOpen(false);
     },
-    [formData]
+    [formData, executeTrade]
   );
 
   const updateFormData = useCallback((updates: Partial<TradingFormData>) => {
@@ -102,9 +104,12 @@ const TradingDialog = memo(function TradingDialog({
           <Button
             type="submit"
             className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            disabled={isLoading}
           >
             <Play className="h-4 w-4 mr-2" />
-            Go {formData.tradeType === "long" ? "Long" : "Short"}
+            {isLoading
+              ? "Executing..."
+              : `Go ${formData.tradeType === "long" ? "Long" : "Short"}`}
           </Button>
         </form>
       </DialogContent>

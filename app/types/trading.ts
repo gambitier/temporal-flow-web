@@ -1,3 +1,5 @@
+import { FormStrategyType, FormTradeType } from "@/lib/services/trading";
+
 export interface OHLCData {
     open: number;
     high: number;
@@ -8,13 +10,13 @@ export interface OHLCData {
 
 export interface TradingFormData {
     symbol: string;
-    strategy: string;
+    strategy: FormStrategyType;
     candleDuration: string;
     quantity: number;
     fundsOnRisk: number;
     entryThreshold: string;
     exitThreshold: string;
-    tradeType: "long" | "short";
+    tradeType: FormTradeType;
     comparePrevCandle: boolean;
 }
 
@@ -30,8 +32,8 @@ export const CANDLE_DURATIONS = [
 
 export const TRADING_STRATEGIES = [
     { value: "threshold", label: "Threshold-based" },
-    { value: "continuouscycle", label: "Continuous Candle Cycle" },
-    { value: "targetpercent", label: "Target-Percentage" },
+    { value: "previous_candle", label: "Previous Candle" },
+    { value: "continuous_cycle", label: "Continuous Cycle" },
 ] as const;
 
 export const ENTRY_THRESHOLDS = [

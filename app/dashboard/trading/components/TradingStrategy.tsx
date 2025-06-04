@@ -1,5 +1,5 @@
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { FormStrategyType } from "@/lib/services/trading";
+import { TRADING_STRATEGIES, CANDLE_DURATIONS } from "@/app/types/trading";
 import {
   Select,
   SelectContent,
@@ -7,14 +7,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CANDLE_DURATIONS, TRADING_STRATEGIES } from "@/app/types/trading";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface TradingStrategyProps {
-  strategy: string;
+  strategy: FormStrategyType;
   candleDuration: string;
   quantity: number;
   fundsOnRisk: number;
-  onStrategyChange: (value: string) => void;
+  onStrategyChange: (value: FormStrategyType) => void;
   onCandleDurationChange: (value: string) => void;
   onQuantityChange: (value: number) => void;
 }
@@ -78,7 +79,8 @@ export function TradingStrategy({
           <Input
             type="number"
             value={quantity}
-            onChange={(e) => onQuantityChange(parseInt(e.target.value) || 0)}
+            onChange={(e) => onQuantityChange(Number(e.target.value))}
+            min={1}
             className="w-full"
           />
         </div>
@@ -86,9 +88,13 @@ export function TradingStrategy({
           <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Funds On Risk:
           </Label>
-          <div className="flex items-center h-10 px-3 rounded-md border border-input bg-background">
-            <span className="text-sm">{fundsOnRisk.toFixed(2)}</span>
-          </div>
+          <Input
+            type="number"
+            value={fundsOnRisk}
+            onChange={(e) => onQuantityChange(Number(e.target.value))}
+            min={0}
+            className="w-full"
+          />
         </div>
       </div>
     </div>
