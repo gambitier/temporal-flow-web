@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +20,7 @@ interface TradingDialogProps {
   ohlcData?: OHLCData;
 }
 
-export function TradingDialog({
+const TradingDialog = memo(function TradingDialog({
   symbol,
   currentPrice,
   ohlcData,
@@ -38,16 +38,19 @@ export function TradingDialog({
     comparePrevCandle: true,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement trading logic
-    console.log("Trading form submitted:", formData);
-    setIsOpen(false);
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      // TODO: Implement trading logic
+      console.log("Trading form submitted:", formData);
+      setIsOpen(false);
+    },
+    [formData]
+  );
 
-  const updateFormData = (updates: Partial<TradingFormData>) => {
+  const updateFormData = useCallback((updates: Partial<TradingFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
-  };
+  }, []);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -107,4 +110,6 @@ export function TradingDialog({
       </DialogContent>
     </Dialog>
   );
-}
+});
+
+export { TradingDialog };

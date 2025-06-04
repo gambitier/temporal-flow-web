@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import {
   TrendingUp,
@@ -61,10 +61,13 @@ interface WebSocketContext {
   offset: number;
 }
 
-const columns: ColumnDef<StockQuote>[] = [
+// Move columns definition outside the component and memoize it
+const createColumns = (
+  TradingDialog: React.ComponentType<any>
+): ColumnDef<StockQuote>[] => [
   {
     accessorKey: "symbol",
-    header: ({ column }) => {
+    header: ({ column }: { column: any }) => {
       return (
         <Button
           variant="ghost"
@@ -94,7 +97,7 @@ const columns: ColumnDef<StockQuote>[] = [
   {
     id: "action",
     header: "Action",
-    cell: ({ row }) => (
+    cell: ({ row }: { row: { original: StockQuote } }) => (
       <TradingDialog
         symbol={row.original.symbol}
         currentPrice={row.original.lastPrice}
@@ -110,7 +113,7 @@ const columns: ColumnDef<StockQuote>[] = [
   },
   {
     accessorKey: "lastPrice",
-    header: ({ column }) => {
+    header: ({ column }: { column: any }) => {
       return (
         <Button
           variant="ghost"
@@ -127,14 +130,14 @@ const columns: ColumnDef<StockQuote>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
-      const value = row.getValue("lastPrice") as number;
+    cell: ({ row }: { row: { getValue: (key: string) => number } }) => {
+      const value = row.getValue("lastPrice");
       return value ? `${value.toFixed(2)}` : "--";
     },
   },
   {
     accessorKey: "change",
-    header: ({ column }) => {
+    header: ({ column }: { column: any }) => {
       return (
         <Button
           variant="ghost"
@@ -151,8 +154,8 @@ const columns: ColumnDef<StockQuote>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
-      const value = row.getValue("change") as number;
+    cell: ({ row }: { row: { getValue: (key: string) => number } }) => {
+      const value = row.getValue("change");
       const formattedValue = value ? `${value.toFixed(2)}` : "--";
       return (
         <div className={value >= 0 ? "text-green-600" : "text-red-600"}>
@@ -163,7 +166,7 @@ const columns: ColumnDef<StockQuote>[] = [
   },
   {
     accessorKey: "changePercent",
-    header: ({ column }) => {
+    header: ({ column }: { column: any }) => {
       return (
         <Button
           variant="ghost"
@@ -180,8 +183,8 @@ const columns: ColumnDef<StockQuote>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
-      const value = row.getValue("changePercent") as number;
+    cell: ({ row }: { row: { getValue: (key: string) => number } }) => {
+      const value = row.getValue("changePercent");
       const formattedValue = value ? `${value.toFixed(2)}%` : "--";
       return (
         <div className={value >= 0 ? "text-green-600" : "text-red-600"}>
@@ -192,7 +195,7 @@ const columns: ColumnDef<StockQuote>[] = [
   },
   {
     accessorKey: "openPrice",
-    header: ({ column }) => {
+    header: ({ column }: { column: any }) => {
       return (
         <Button
           variant="ghost"
@@ -209,14 +212,14 @@ const columns: ColumnDef<StockQuote>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
-      const value = row.getValue("openPrice") as number;
+    cell: ({ row }: { row: { getValue: (key: string) => number } }) => {
+      const value = row.getValue("openPrice");
       return value ? `${value.toFixed(2)}` : "--";
     },
   },
   {
     accessorKey: "highPrice",
-    header: ({ column }) => {
+    header: ({ column }: { column: any }) => {
       return (
         <Button
           variant="ghost"
@@ -233,14 +236,14 @@ const columns: ColumnDef<StockQuote>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
-      const value = row.getValue("highPrice") as number;
+    cell: ({ row }: { row: { getValue: (key: string) => number } }) => {
+      const value = row.getValue("highPrice");
       return value ? `${value.toFixed(2)}` : "--";
     },
   },
   {
     accessorKey: "lowPrice",
-    header: ({ column }) => {
+    header: ({ column }: { column: any }) => {
       return (
         <Button
           variant="ghost"
@@ -257,14 +260,14 @@ const columns: ColumnDef<StockQuote>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
-      const value = row.getValue("lowPrice") as number;
+    cell: ({ row }: { row: { getValue: (key: string) => number } }) => {
+      const value = row.getValue("lowPrice");
       return value ? `${value.toFixed(2)}` : "--";
     },
   },
   {
     accessorKey: "closePrice",
-    header: ({ column }) => {
+    header: ({ column }: { column: any }) => {
       return (
         <Button
           variant="ghost"
@@ -281,14 +284,14 @@ const columns: ColumnDef<StockQuote>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
-      const value = row.getValue("closePrice") as number;
+    cell: ({ row }: { row: { getValue: (key: string) => number } }) => {
+      const value = row.getValue("closePrice");
       return value ? `${value.toFixed(2)}` : "--";
     },
   },
   {
     accessorKey: "volume",
-    header: ({ column }) => {
+    header: ({ column }: { column: any }) => {
       return (
         <Button
           variant="ghost"
@@ -305,14 +308,14 @@ const columns: ColumnDef<StockQuote>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
-      const value = row.getValue("volume") as number;
+    cell: ({ row }: { row: { getValue: (key: string) => number } }) => {
+      const value = row.getValue("volume");
       return value ? value.toLocaleString() : "--";
     },
   },
   {
     accessorKey: "timestamp",
-    header: ({ column }) => {
+    header: ({ column }: { column: any }) => {
       return (
         <Button
           variant="ghost"
@@ -329,8 +332,8 @@ const columns: ColumnDef<StockQuote>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
-      const value = row.getValue("timestamp") as string;
+    cell: ({ row }: { row: { getValue: (key: string) => string } }) => {
+      const value = row.getValue("timestamp");
       return value ? new Date(value).toLocaleString() : "--";
     },
   },
@@ -344,6 +347,38 @@ export default function TradingPage() {
   const [mounted, setMounted] = useState(false);
   const { subscribeToWatchlist, isSubscribing, stockData } =
     useWatchlistSubscription();
+
+  // Memoize the columns
+  const columns = useMemo(() => createColumns(TradingDialog), []);
+
+  // Memoize filtered stocks
+  const filteredStocks = useMemo(() => {
+    return stockData.filter((stock) => {
+      switch (filter) {
+        case "gainers":
+          return stock.changePercent > 0;
+        case "losers":
+          return stock.changePercent < 0;
+        default:
+          return true;
+      }
+    });
+  }, [stockData, filter]);
+
+  // Memoize watchlist change handler
+  const handleWatchlistChange = useCallback(
+    async (watchlistId: string) => {
+      if (!watchlistId || watchlistId === selectedWatchlist) return;
+
+      try {
+        setSelectedWatchlist(watchlistId);
+        await subscribeToWatchlist(watchlistId);
+      } catch (error) {
+        console.error("Failed to subscribe to watchlist:", error);
+      }
+    },
+    [selectedWatchlist, subscribeToWatchlist]
+  );
 
   // Handle initial sorting state after mount
   useEffect(() => {
@@ -365,18 +400,6 @@ export default function TradingPage() {
     }
   }, [sorting, mounted]);
 
-  // Filter stocks based on selected filter
-  const filteredStocks = stockData.filter((stock) => {
-    switch (filter) {
-      case "gainers":
-        return stock.changePercent > 0;
-      case "losers":
-        return stock.changePercent < 0;
-      default:
-        return true;
-    }
-  });
-
   // Fetch watchlists
   const { watchlists, isLoading: isLoadingWatchlists } = useWatchlists();
 
@@ -393,23 +416,6 @@ export default function TradingPage() {
   // Fetch symbols for selected watchlist
   const { symbols, isLoading: isLoadingSymbols } =
     useWatchlistSymbols(selectedWatchlist);
-
-  // Handle watchlist selection
-  const handleWatchlistChange = async (watchlistId: string) => {
-    if (!watchlistId) return;
-
-    // Don't resubscribe if it's the same watchlist
-    if (watchlistId === selectedWatchlist) {
-      return;
-    }
-
-    try {
-      setSelectedWatchlist(watchlistId);
-      await subscribeToWatchlist(watchlistId);
-    } catch (error) {
-      console.error("Failed to subscribe to watchlist:", error);
-    }
-  };
 
   if (!mounted) {
     return null; // Return null on server-side and first render
