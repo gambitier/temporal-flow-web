@@ -14,13 +14,7 @@ export interface ExecuteTradeRequest {
     exitThreshold: number;
     quantity: number;
     candleDuration: CandleDuration;
-    prevCandle?: {
-        open: number;
-        high: number;
-        low: number;
-        close: number;
-        timestamp: string;
-    };
+    requestedExecutionPrice: number;
     comparePrevCandle: boolean;
 }
 
@@ -55,6 +49,7 @@ export const executeTrade = async (data: ExecuteTradeRequest): Promise<ExecuteTr
     return response.json();
 };
 
+//TODO: use LTP instead of ohlcData
 export const mapFormDataToRequest = (formData: TradingFormData, ohlcData?: OHLCData): ExecuteTradeRequest => {
     const request: ExecuteTradeRequest = {
         symbol: formData.symbol,
@@ -65,11 +60,10 @@ export const mapFormDataToRequest = (formData: TradingFormData, ohlcData?: OHLCD
         quantity: formData.quantity,
         candleDuration: formData.candleDuration,
         comparePrevCandle: formData.comparePrevCandle,
+        requestedExecutionPrice: ohlcData?.close || 0, //TODO: use LTP
     };
 
-    if (formData.comparePrevCandle && ohlcData) {
-        request.prevCandle = ohlcData;
-    }
+
 
     return request;
 };
