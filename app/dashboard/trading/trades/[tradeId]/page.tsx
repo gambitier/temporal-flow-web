@@ -68,54 +68,43 @@ function buildTradeTree(trades: TradeInfo[], rootId: string) {
   return map[rootId];
 }
 
-function TradeDetails({
+function TradeTableRow({
   trade,
-  level = 0,
+  router,
 }: {
   trade: TradeInfo;
-  level?: number;
+  router: ReturnType<typeof useRouter>;
 }) {
-  const router = useRouter();
+  const rowColor =
+    trade.status === "ACTIVE"
+      ? "bg-green-50 hover:bg-green-100"
+      : "bg-gray-50 hover:bg-gray-100";
   return (
-    <div
-      className={`relative bg-white rounded-lg shadow p-4 mb-4 border-l-4 ${
-        trade.status === "ACTIVE" ? "border-green-500" : "border-gray-300"
-      } ${level > 0 ? "ml-8" : ""}`}
-    >
-      <div className="flex justify-between items-center">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-lg">
-              Trade #{trade.tradeID}
+    <>
+      <tr className={`transition-colors ${rowColor}`}>
+        <td className="px-4 py-2 font-semibold text-purple-700 underline">
+          {trade.tradeID}
+        </td>
+        <td className="px-4 py-2">
+          {trade.status === "ACTIVE" ? (
+            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
+              Active
             </span>
-            {trade.status === "ACTIVE" ? (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                Active
-              </span>
-            ) : (
-              <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
-                Closed
-              </span>
-            )}
-            {trade.parentTradeID && (
-              <span className="text-xs text-gray-400">
-                (child of {trade.parentTradeID})
-              </span>
-            )}
-          </div>
-          <div className="text-sm text-gray-500 mt-1">
-            Entry: <b>{trade.entryPrice ?? "-"}</b> at{" "}
-            {trade.entryAt ? new Date(trade.entryAt).toLocaleString() : "-"}
-            {trade.exitPrice && (
-              <>
-                {" "}
-                | Exit: <b>{trade.exitPrice}</b> at{" "}
-                {trade.exitAt ? new Date(trade.exitAt).toLocaleString() : "-"}
-              </>
-            )}
-          </div>
-        </div>
-        <div className="flex gap-2">
+          ) : (
+            <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded">
+              Closed
+            </span>
+          )}
+        </td>
+        <td className="px-4 py-2">{trade.entryPrice ?? "-"}</td>
+        <td className="px-4 py-2">{trade.exitPrice ?? "-"}</td>
+        <td className="px-4 py-2">
+          {trade.entryAt ? new Date(trade.entryAt).toLocaleString() : "-"}
+        </td>
+        <td className="px-4 py-2">
+          {trade.exitAt ? new Date(trade.exitAt).toLocaleString() : "-"}
+        </td>
+        <td className="px-4 py-2 flex gap-2">
           <button
             className="text-purple-600 hover:underline text-sm px-2 py-1 rounded border border-purple-100 bg-purple-50 hover:bg-purple-100"
             onClick={() =>
@@ -124,19 +113,19 @@ function TradeDetails({
           >
             Logs
           </button>
-        </div>
-      </div>
-      {/* Render children recursively */}
+        </td>
+      </tr>
       {trade.children &&
         trade.children.map((child) => (
-          <TradeDetails key={child.tradeID} trade={child} level={level + 1} />
+          <TradeTableRow key={child.tradeID} trade={child} router={router} />
         ))}
-    </div>
+    </>
   );
 }
 
 export default function TradeInfoPage() {
   const params = useParams();
+  const router = useRouter();
   const { tradeId } = params;
   // Find the root trade and build its tree
   const trade = buildTradeTree(trades, tradeId as string);
@@ -146,12 +135,27 @@ export default function TradeInfoPage() {
     );
   }
   return (
-    <div className="py-8 max-w-2xl mx-auto">
+    <div className="py-8 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Trade Details</h1>
-      <TradeDetails trade={trade} />
+      <table className="min-w-full border border-gray-200 bg-white rounded-md overflow-hidden shadow">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="px-4 py-2 text-left">Trade ID</th>
+            <th className="px-4 py-2 text-left">Status</th>
+            <th className="px-4 py-2 text-left">Entry Price</th>
+            <th className="px-4 py-2 text-left">Exit Price</th>
+            <th className="px-4 py-2 text-left">Entry At</th>
+            <th className="px-4 py-2 text-left">Exit At</th>
+            <th className="px-4 py-2 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <TradeTableRow trade={trade} router={router} />
+        </tbody>
+      </table>
       <Link
         href="/dashboard/trading/trades"
-        className="text-blue-600 hover:underline text-sm"
+        className="text-blue-600 hover:underline text-sm mt-4 inline-block"
       >
         ← Back to Trades
       </Link>
