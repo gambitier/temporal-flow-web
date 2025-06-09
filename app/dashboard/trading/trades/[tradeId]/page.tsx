@@ -2,6 +2,9 @@
 
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/ui/data-table";
+import { ColumnDef } from "@tanstack/react-table";
 
 // Sample TradeInfo type (same as in trades/page.tsx)
 type TradeInfo = {
@@ -51,108 +54,123 @@ const trades: TradeInfo[] = [
   },
 ];
 
-// Helper to build parent/child tree
-function buildTradeTree(trades: TradeInfo[], rootId: string) {
-  const map: { [id: string]: TradeInfo & { children?: TradeInfo[] } } = {};
-  trades.forEach((trade) => {
-    map[trade.tradeID] = { ...trade };
-  });
-  Object.values(map).forEach((trade) => {
-    if (trade.parentTradeID && map[trade.parentTradeID]) {
-      map[trade.parentTradeID].children =
-        map[trade.parentTradeID].children || [];
-      map[trade.parentTradeID].children!.push(trade);
+// Helper to flatten the trade tree for DataTable
+function flattenTradeTree(trade: TradeInfo): TradeInfo[] {
+  const result: TradeInfo[] = [trade];
+  if (trade.children) {
+    for (const child of trade.children) {
+      result.push(...flattenTradeTree(child));
     }
-  });
-  // Return the root trade and its children
-  return map[rootId];
+  }
+  return result;
 }
 
-function TradeTableRow({
-  trade,
-  router,
-}: {
-  trade: TradeInfo;
-  router: ReturnType<typeof useRouter>;
-}) {
-  const rowColor =
-    trade.status === "ACTIVE"
-      ? "bg-green-50 hover:bg-green-100"
-      : "bg-gray-50 hover:bg-gray-100";
-  return (
-    <>
-      <tr className={`transition-colors ${rowColor}`}>
-        <td className="px-4 py-2 font-semibold text-purple-700 underline">
-          {trade.tradeID}
-        </td>
-        <td className="px-4 py-2">
-          {trade.status === "ACTIVE" ? (
-            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
-              Active
-            </span>
-          ) : (
-            <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded">
-              Closed
-            </span>
-          )}
-        </td>
-        <td className="px-4 py-2">{trade.entryPrice ?? "-"}</td>
-        <td className="px-4 py-2">{trade.exitPrice ?? "-"}</td>
-        <td className="px-4 py-2">
-          {trade.entryAt ? new Date(trade.entryAt).toLocaleString() : "-"}
-        </td>
-        <td className="px-4 py-2">
-          {trade.exitAt ? new Date(trade.exitAt).toLocaleString() : "-"}
-        </td>
-        <td className="px-4 py-2 flex gap-2">
-          <button
-            className="text-purple-600 hover:underline text-sm px-2 py-1 rounded border border-purple-100 bg-purple-50 hover:bg-purple-100"
+const columns: ColumnDef<TradeInfo>[] = [
+  {
+    accessorKey: "tradeID",
+    header: "Trade ID",
+    cell: ({ row }) => (
+      <Link
+        href={`/dashboard/trading/trades/${row.original.tradeID}`}
+        className="text-purple-700 hover:underline"
+      >
+        {row.original.tradeID}
+      </Link>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) =>
+      row.original.status === "ACTIVE" ? (
+        <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-0.5 rounded font-normal">
+          Active
+        </span>
+      ) : (
+        <span className="text-xs bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-normal">
+          Closed
+        </span>
+      ),
+  },
+  {
+    accessorKey: "entryPrice",
+    header: "Entry Price",
+    cell: ({ row }) => row.original.entryPrice ?? "-",
+  },
+  {
+    accessorKey: "exitPrice",
+    header: "Exit Price",
+    cell: ({ row }) => row.original.exitPrice ?? "-",
+  },
+  {
+    accessorKey: "entryAt",
+    header: "Entry At",
+    cell: ({ row }) =>
+      row.original.entryAt
+        ? new Date(row.original.entryAt).toLocaleString()
+        : "-",
+  },
+  {
+    accessorKey: "exitAt",
+    header: "Exit At",
+    cell: ({ row }) =>
+      row.original.exitAt
+        ? new Date(row.original.exitAt).toLocaleString()
+        : "-",
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const router = useRouter();
+      return (
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() =>
-              router.push(`/dashboard/trading/logs/${trade.tradeID}`)
+              router.push(`/dashboard/trading/trades/${row.original.tradeID}`)
+            }
+          >
+            View
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() =>
+              router.push(`/dashboard/trading/logs/${row.original.tradeID}`)
             }
           >
             Logs
-          </button>
-        </td>
-      </tr>
-      {trade.children &&
-        trade.children.map((child) => (
-          <TradeTableRow key={child.tradeID} trade={child} router={router} />
-        ))}
-    </>
-  );
-}
+          </Button>
+        </div>
+      );
+    },
+  },
+];
 
 export default function TradeInfoPage() {
   const params = useParams();
-  const router = useRouter();
   const { tradeId } = params;
   // Find the root trade and build its tree
-  const trade = buildTradeTree(trades, tradeId as string);
-  if (!trade) {
+  const rootTrade = trades.find((t) => t.tradeID === tradeId);
+  if (!rootTrade) {
     return (
       <div className="py-8 text-center text-gray-500">Trade not found.</div>
     );
   }
+  const flatTrades = flattenTradeTree(rootTrade);
   return (
-    <div className="py-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Trade Details</h1>
-      <table className="min-w-full border border-gray-200 bg-white rounded-md overflow-hidden shadow">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-4 py-2 text-left">Trade ID</th>
-            <th className="px-4 py-2 text-left">Status</th>
-            <th className="px-4 py-2 text-left">Entry Price</th>
-            <th className="px-4 py-2 text-left">Exit Price</th>
-            <th className="px-4 py-2 text-left">Entry At</th>
-            <th className="px-4 py-2 text-left">Exit At</th>
-            <th className="px-4 py-2 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <TradeTableRow trade={trade} router={router} />
-        </tbody>
-      </table>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+        <h1 className="heading1 flex-shrink-0">Trade Details</h1>
+      </div>
+      <DataTable
+        columns={columns}
+        data={flatTrades}
+        searchKey="tradeID"
+        tableId="trade-details-table"
+      />
       <Link
         href="/dashboard/trading/trades"
         className="text-blue-600 hover:underline text-sm mt-4 inline-block"
