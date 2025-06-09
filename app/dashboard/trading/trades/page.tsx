@@ -55,8 +55,11 @@ const trades: TradeInfo[] = [
 export default function TradesPage() {
   const router = useRouter();
   return (
-    <div className="py-8 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Trades</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+        <h1 className="heading1 flex-shrink-0">Trades</h1>
+        {/* Add filters/search here if needed */}
+      </div>
       <div className="overflow-x-auto rounded-lg shadow">
         <table className="min-w-full bg-white border border-gray-200">
           <thead className="sticky top-0 bg-gray-50 z-10">
@@ -145,7 +148,7 @@ export default function TradesPage() {
           </tbody>
         </table>
       </div>
-      <p className="mt-4 text-gray-500 text-sm">
+      <p className="text-gray-500 text-sm">
         Click a Trade ID, row, or "View" to see trade details. "Logs" opens the
         trade's logs. Status is color-coded.
       </p>
