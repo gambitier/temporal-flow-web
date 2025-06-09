@@ -83,30 +83,37 @@ export default function TradesPage() {
                     : "bg-muted"
                 }`}
               >
-                <td className="px-4 py-2 font-semibold text-purple-700 underline">
-                  <Link href={`/dashboard/trading/trades/${trade.tradeID}`}>
+                <td className="px-4 py-2 text-foreground">
+                  <Link
+                    href={`/dashboard/trading/trades/${trade.tradeID}`}
+                    className="text-purple-700 hover:underline transition"
+                  >
                     {trade.tradeID}
                   </Link>
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 text-foreground">
                   {trade.status === "ACTIVE" ? (
-                    <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-0.5 rounded">
+                    <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-0.5 rounded font-normal">
                       Active
                     </span>
                   ) : (
-                    <span className="text-xs bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded">
+                    <span className="text-xs bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-normal">
                       Closed
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-2">{trade.entryPrice ?? "-"}</td>
-                <td className="px-4 py-2">{trade.exitPrice ?? "-"}</td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 text-foreground font-normal">
+                  {trade.entryPrice ?? "-"}
+                </td>
+                <td className="px-4 py-2 text-foreground font-normal">
+                  {trade.exitPrice ?? "-"}
+                </td>
+                <td className="px-4 py-2 text-foreground font-normal">
                   {trade.entryAt
                     ? new Date(trade.entryAt).toLocaleString()
                     : "-"}
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 text-foreground font-normal">
                   {trade.exitAt ? new Date(trade.exitAt).toLocaleString() : "-"}
                 </td>
                 <td className="px-4 py-2 flex gap-2">
