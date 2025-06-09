@@ -61,30 +61,16 @@ export default function TradesPage() {
         {/* Add filters/search here if needed */}
       </div>
       <div className="overflow-x-auto rounded-lg shadow">
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead className="sticky top-0 bg-gray-50 z-10">
+        <table className="min-w-full border border-border bg-background text-foreground">
+          <thead className="sticky top-0 z-10 bg-background">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-gray-700">
-                Trade ID
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-700">
-                Status
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-700">
-                Entry Price
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-700">
-                Exit Price
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-700">
-                Entry At
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-700">
-                Exit At
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-700">
-                Actions
-              </th>
+              <th className="px-4 py-3 text-left font-medium">Trade ID</th>
+              <th className="px-4 py-3 text-left font-medium">Status</th>
+              <th className="px-4 py-3 text-left font-medium">Entry Price</th>
+              <th className="px-4 py-3 text-left font-medium">Exit Price</th>
+              <th className="px-4 py-3 text-left font-medium">Entry At</th>
+              <th className="px-4 py-3 text-left font-medium">Exit At</th>
+              <th className="px-4 py-3 text-left font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -93,8 +79,8 @@ export default function TradesPage() {
                 key={trade.tradeID}
                 className={`transition-colors ${
                   trade.status === "ACTIVE"
-                    ? "bg-green-50 hover:bg-green-100"
-                    : "bg-gray-50 hover:bg-gray-100"
+                    ? "bg-green-50 dark:bg-green-950"
+                    : "bg-muted"
                 }`}
               >
                 <td className="px-4 py-2 font-semibold text-purple-700 underline">
@@ -104,11 +90,11 @@ export default function TradesPage() {
                 </td>
                 <td className="px-4 py-2">
                   {trade.status === "ACTIVE" ? (
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
+                    <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-0.5 rounded">
                       Active
                     </span>
                   ) : (
-                    <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded">
+                    <span className="text-xs bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded">
                       Closed
                     </span>
                   )}
@@ -148,7 +134,7 @@ export default function TradesPage() {
           </tbody>
         </table>
       </div>
-      <p className="text-gray-500 text-sm">
+      <p className="text-muted-foreground text-sm">
         Click a Trade ID, row, or "View" to see trade details. "Logs" opens the
         trade's logs. Status is color-coded.
       </p>
