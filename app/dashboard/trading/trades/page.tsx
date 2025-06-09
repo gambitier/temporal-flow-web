@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 // Sample TradeInfo type (simplified for demo)
 type TradeInfo = {
@@ -12,6 +13,7 @@ type TradeInfo = {
   exitPrice?: number;
   entryAt?: string;
   exitAt?: string;
+  children?: TradeInfo[];
 };
 
 // Mock trades data (with parent/child relationship)
@@ -53,33 +55,44 @@ const trades: TradeInfo[] = [
 export default function TradesPage() {
   const router = useRouter();
   return (
-    <div className="py-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Your Trades</h1>
-      <table className="min-w-full border border-gray-200 bg-white rounded-md overflow-hidden shadow">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-4 py-2 text-left">Trade ID</th>
-            <th className="px-4 py-2 text-left">Status</th>
-            <th className="px-4 py-2 text-left">Entry Price</th>
-            <th className="px-4 py-2 text-left">Exit Price</th>
-            <th className="px-4 py-2 text-left">Entry At</th>
-            <th className="px-4 py-2 text-left">Exit At</th>
-            <th className="px-4 py-2 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {trades.map((trade) => {
-            const rowColor =
-              trade.status === "ACTIVE"
-                ? "bg-green-50 hover:bg-green-100"
-                : "bg-gray-50 hover:bg-gray-100";
-            return (
+    <div className="py-8 max-w-5xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">Trades</h1>
+      <div className="overflow-x-auto rounded-lg shadow">
+        <table className="min-w-full bg-white border border-gray-200">
+          <thead className="sticky top-0 bg-gray-50 z-10">
+            <tr>
+              <th className="px-4 py-3 text-left font-medium text-gray-700">
+                Trade ID
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-700">
+                Status
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-700">
+                Entry Price
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-700">
+                Exit Price
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-700">
+                Entry At
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-700">
+                Exit At
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-700">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {trades.map((trade) => (
               <tr
                 key={trade.tradeID}
-                className={`cursor-pointer transition-colors ${rowColor}`}
-                onClick={() =>
-                  router.push(`/dashboard/trading/trades/${trade.tradeID}`)
-                }
+                className={`transition-colors ${
+                  trade.status === "ACTIVE"
+                    ? "bg-green-50 hover:bg-green-100"
+                    : "bg-gray-50 hover:bg-gray-100"
+                }`}
               >
                 <td className="px-4 py-2 font-semibold text-purple-700 underline">
                   <Link href={`/dashboard/trading/trades/${trade.tradeID}`}>
@@ -108,30 +121,30 @@ export default function TradesPage() {
                   {trade.exitAt ? new Date(trade.exitAt).toLocaleString() : "-"}
                 </td>
                 <td className="px-4 py-2 flex gap-2">
-                  <button
-                    className="text-blue-600 hover:underline text-sm px-2 py-1 rounded border border-blue-100 bg-blue-50 hover:bg-blue-100"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/dashboard/trading/trades/${trade.tradeID}`);
-                    }}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      router.push(`/dashboard/trading/trades/${trade.tradeID}`)
+                    }
                   >
                     View
-                  </button>
-                  <button
-                    className="text-purple-600 hover:underline text-sm px-2 py-1 rounded border border-purple-100 bg-purple-50 hover:bg-purple-100"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/dashboard/trading/logs/${trade.tradeID}`);
-                    }}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() =>
+                      router.push(`/dashboard/trading/logs/${trade.tradeID}`)
+                    }
                   >
                     Logs
-                  </button>
+                  </Button>
                 </td>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <p className="mt-4 text-gray-500 text-sm">
         Click a Trade ID, row, or "View" to see trade details. "Logs" opens the
         trade's logs. Status is color-coded.
