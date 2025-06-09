@@ -133,7 +133,7 @@ const DialogContentComponent = memo(function DialogContentComponent() {
 
   return (
     <DialogContent
-      className="sm:max-w-[600px] bg-white dark:bg-gray-800"
+      className="w-full max-w-lg sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800"
       onPointerDownOutside={(e) => e.preventDefault()}
     >
       <DialogHeader>
