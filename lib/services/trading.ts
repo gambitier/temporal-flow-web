@@ -127,4 +127,24 @@ export const fetchTrades = async (): Promise<Trade[]> => {
     }
 
     return response.json();
+};
+
+export const fetchTradeDetails = async (tradeId: string): Promise<Trade[]> => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+        throw new Error("Authentication token not found");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/trades/${tradeId}`, {
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to fetch trade details");
+    }
+
+    return response.json();
 }; 
