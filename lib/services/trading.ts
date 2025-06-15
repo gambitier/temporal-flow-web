@@ -24,6 +24,34 @@ export interface ExecuteTradeResponse {
     tradeId?: string;
 }
 
+export interface Trade {
+    id: string;
+    parentTradeID: string | null;
+    userID: string;
+    brokerID: string;
+    symbol: string;
+    order: {
+        symbol: string;
+        tradeType: TradeType;
+        strategyType: StrategyType;
+        quantity: number;
+        comparePrevCandle: boolean;
+        isRecurring: boolean;
+        candleDuration: CandleDuration;
+        requestedExecutionPrice: number;
+        entryThreshold: number;
+        exitThreshold: number;
+        createdAt: string;
+    } | null;
+    entryPrice: number | null;
+    exitPrice: number | null;
+    entryAt: string | null;
+    exitAt: string | null;
+    status: "PENDING" | "ACTIVE" | "CLOSED";
+    createdAt: string;
+    updatedAt: string;
+}
+
 const API_BASE_URL = "http://localhost:8085/api/v1";
 
 export const executeTrade = async (data: ExecuteTradeRequest): Promise<ExecuteTradeResponse> => {
@@ -79,4 +107,24 @@ const mapStrategyType = (strategy: FormStrategyType): StrategyType => {
         default:
             throw new Error(`Invalid strategy type: ${strategy}`);
     }
+};
+
+export const fetchTrades = async (): Promise<Trade[]> => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+        throw new Error("Authentication token not found");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/trades`, {
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to fetch trades");
+    }
+
+    return response.json();
 }; 

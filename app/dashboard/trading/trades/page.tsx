@@ -5,81 +5,49 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
+import { useTrades } from "@/lib/hooks/useTrades";
+import { Trade } from "@/lib/services/trading";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Sample TradeInfo type (simplified for demo)
-type TradeInfo = {
-  tradeID: string;
-  parentTradeID?: string | null;
-  status: "ACTIVE" | "CLOSED";
-  entryPrice?: number;
-  exitPrice?: number;
-  entryAt?: string;
-  exitAt?: string;
-  children?: TradeInfo[];
-};
-
-// Mock trades data (with parent/child relationship)
-const trades: TradeInfo[] = [
+const columns: ColumnDef<Trade>[] = [
   {
-    tradeID: "1",
-    status: "ACTIVE",
-    entryPrice: 100,
-    entryAt: "2024-06-10T10:00:00Z",
-    parentTradeID: null,
-  },
-  {
-    tradeID: "2",
-    status: "CLOSED",
-    entryPrice: 120,
-    exitPrice: 130,
-    entryAt: "2024-06-09T09:00:00Z",
-    exitAt: "2024-06-09T10:00:00Z",
-    parentTradeID: null,
-  },
-  {
-    tradeID: "3",
-    status: "ACTIVE",
-    entryPrice: 105,
-    entryAt: "2024-06-10T10:30:00Z",
-    parentTradeID: "1",
-  },
-  {
-    tradeID: "4",
-    status: "CLOSED",
-    entryPrice: 110,
-    exitPrice: 115,
-    entryAt: "2024-06-09T11:00:00Z",
-    exitAt: "2024-06-09T12:00:00Z",
-    parentTradeID: "2",
-  },
-];
-
-const columns: ColumnDef<TradeInfo>[] = [
-  {
-    accessorKey: "tradeID",
+    accessorKey: "id",
     header: "Trade ID",
     cell: ({ row }) => (
       <Link
-        href={`/dashboard/trading/trades/${row.original.tradeID}`}
+        href={`/dashboard/trading/trades/${row.original.id}`}
         className="text-purple-700 hover:underline"
       >
-        {row.original.tradeID}
+        {row.original.id}
       </Link>
     ),
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) =>
-      row.original.status === "ACTIVE" ? (
-        <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-0.5 rounded font-normal">
-          Active
+    cell: ({ row }) => {
+      const status = row.original.status;
+      const statusStyles = {
+        PENDING:
+          "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300",
+        ACTIVE:
+          "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300",
+        CLOSED: "bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300",
+      };
+
+      return (
+        <span
+          className={`text-xs ${statusStyles[status]} px-2 py-0.5 rounded font-normal`}
+        >
+          {status}
         </span>
-      ) : (
-        <span className="text-xs bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded font-normal">
-          Closed
-        </span>
-      ),
+      );
+    },
+  },
+  {
+    accessorKey: "symbol",
+    header: "Symbol",
+    cell: ({ row }) => row.original.symbol || "-",
   },
   {
     accessorKey: "entryPrice",
@@ -118,7 +86,7 @@ const columns: ColumnDef<TradeInfo>[] = [
             variant="outline"
             size="sm"
             onClick={() =>
-              router.push(`/dashboard/trading/trades/${row.original.tradeID}`)
+              router.push(`/dashboard/trading/trades/${row.original.id}`)
             }
           >
             View
@@ -127,7 +95,7 @@ const columns: ColumnDef<TradeInfo>[] = [
             variant="secondary"
             size="sm"
             onClick={() =>
-              router.push(`/dashboard/trading/logs/${row.original.tradeID}`)
+              router.push(`/dashboard/trading/logs/${row.original.id}`)
             }
           >
             Logs
@@ -139,6 +107,37 @@ const columns: ColumnDef<TradeInfo>[] = [
 ];
 
 export default function TradesPage() {
+  const { data: trades, isLoading, error } = useTrades();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+          <h1 className="heading1 flex-shrink-0">Trades</h1>
+        </div>
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+          <h1 className="heading1 flex-shrink-0">Trades</h1>
+        </div>
+        <div className="text-red-500">
+          Error loading trades:{" "}
+          {error instanceof Error ? error.message : "Unknown error"}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
@@ -146,8 +145,8 @@ export default function TradesPage() {
       </div>
       <DataTable
         columns={columns}
-        data={trades}
-        searchKey="tradeID"
+        data={trades || []}
+        searchKey="id"
         tableId="trades-table"
       />
       <p className="text-muted-foreground text-sm">

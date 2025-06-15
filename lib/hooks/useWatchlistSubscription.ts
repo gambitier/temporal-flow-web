@@ -130,7 +130,7 @@ export function useWatchlistSubscription() {
             });
 
             subscription.on("publication", (ctx: any) => {
-                console.log("Received watchlist update for channel:", channel, ctx);
+                // console.log("Received watchlist update for channel:", channel, ctx);
                 if (ctx.data && ctx.data.data) {
                     const quotes = ctx.data.data;
                     setStockData((prevData) => {
