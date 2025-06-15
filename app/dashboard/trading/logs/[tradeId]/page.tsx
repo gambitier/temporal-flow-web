@@ -43,22 +43,34 @@ export default function TradeLogDetailPage() {
     return parentTradeId || tradeId;
   };
 
-  const renderHeader = () => (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-      <div className="space-y-1">
-        <h1 className="heading1 flex-shrink-0">Trade Logs</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Trade ID: {tradeId}
-        </p>
+  const getTradeInfo = () => {
+    if (!logs || logs.length === 0) return { symbol: "-" };
+    const firstLog = logs[0];
+    return {
+      symbol: firstLog.metadata.order?.symbol || "-",
+    };
+  };
+
+  const renderHeader = () => {
+    const { symbol } = getTradeInfo();
+    return (
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+        <div className="space-y-1">
+          <h1 className="heading1 flex-shrink-0">Trade Logs</h1>
+          <div className="text-sm text-gray-500 dark:text-gray-400 space-y-0.5">
+            <p>Trade ID: {tradeId}</p>
+            <p>Symbol: {symbol}</p>
+          </div>
+        </div>
+        <Link
+          href={`/dashboard/trading/trades/${getBackLink()}`}
+          className="text-blue-600 hover:underline text-sm"
+        >
+          ← Back to Trade Details
+        </Link>
       </div>
-      <Link
-        href={`/dashboard/trading/trades/${getBackLink()}`}
-        className="text-blue-600 hover:underline text-sm"
-      >
-        ← Back to Trade Details
-      </Link>
-    </div>
-  );
+    );
+  };
 
   if (isLoading) {
     return (
