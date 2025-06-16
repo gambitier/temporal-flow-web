@@ -6,9 +6,9 @@ export const useTradeLogs = (tradeId: string) => {
         queryKey: ["trade-logs", tradeId],
         queryFn: () => {
             // Use mock data in development
-            if (process.env.NODE_ENV === "development") {
-                return Promise.resolve(getMockTradeLogs(tradeId));
-            }
+            // if (process.env.NODE_ENV === "development") {
+            //     return Promise.resolve(getMockTradeLogs(tradeId));
+            // }
             return fetchTradeLogs(tradeId);
         },
     });
