@@ -31,7 +31,15 @@ import {
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: TrendingUp },
-  { name: "Trading", href: "/dashboard/trading", icon: LineChart },
+  {
+    name: "Trading",
+    icon: LineChart,
+    children: [
+      { name: "Watchlist", href: "/dashboard/trading" },
+      { name: "Trades", href: "/dashboard/trading/trades" },
+      { name: "Logs", href: "/dashboard/trading/logs" },
+    ],
+  },
   { name: "Profile", href: "/dashboard/profile", icon: User },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
@@ -46,28 +54,76 @@ function SidebarNav({
   logout: () => void;
   isCollapsed?: boolean;
 }) {
+  const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
+
+  const toggleMenu = (name: string) => {
+    setOpenMenus((prev) => ({ ...prev, [name]: !prev[name] }));
+  };
+
   return (
     <>
       {navigation.map((item) => {
+        if (item.children) {
+          // Collapsible parent
+          const isOpen =
+            openMenus[item.name] ||
+            item.children.some((child) => pathname.startsWith(child.href));
+          const isActive = item.children.some((child) =>
+            pathname.startsWith(child.href)
+          );
+          return (
+            <div key={item.name}>
+              <button
+                onClick={() => toggleMenu(item.name)}
+                className={`group flex items-center w-full px-2 py-2 text-sm font-medium rounded-md transition-colors duration-150 ${
+                  isActive
+                    ? "bg-purple-50 text-purple-600 dark:bg-purple-900 dark:text-purple-200"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+                } ${isCollapsed ? "justify-center" : ""}`}
+                title={isCollapsed ? item.name : ""}
+              >
+                <item.icon
+                  className={`h-5 w-5 ${!isCollapsed ? "mr-3" : ""}`}
+                />
+                {!isCollapsed && item.name}
+                {!isCollapsed && (
+                  <span className="ml-auto text-xs">{isOpen ? "▲" : "▼"}</span>
+                )}
+              </button>
+              {isOpen && !isCollapsed && (
+                <div className="ml-8 mt-1 space-y-1">
+                  {item.children.map((child) => (
+                    <Link
+                      key={child.name}
+                      href={child.href}
+                      className={`block px-2 py-2 text-sm rounded-md transition-colors duration-150 ${
+                        pathname === child.href
+                          ? "bg-purple-100 text-purple-700"
+                          : "text-gray-500 hover:text-gray-700"
+                      }`}
+                    >
+                      {child.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        }
+        // Regular item
         const isActive = pathname === item.href;
         return (
           <Link
             key={item.name}
             href={item.href}
-            className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+            className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-150 ${
               isActive
                 ? "bg-purple-50 text-purple-600 dark:bg-purple-900 dark:text-purple-200"
                 : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
             } ${isCollapsed ? "justify-center" : ""}`}
             title={isCollapsed ? item.name : ""}
           >
-            <item.icon
-              className={`h-5 w-5 ${
-                isActive
-                  ? "text-purple-600 dark:text-purple-200"
-                  : "text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-300"
-              } ${!isCollapsed ? "mr-3" : ""}`}
-            />
+            <item.icon className={`h-5 w-5 ${!isCollapsed ? "mr-3" : ""}`} />
             {!isCollapsed && item.name}
           </Link>
         );
